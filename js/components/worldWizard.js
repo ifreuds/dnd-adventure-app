@@ -204,7 +204,16 @@ export function renderWorldWizard(container) {
       render();
     } else {
       // Finish: Navigate to Main Game UI with wizard data
-      import("./gameUI.js").then(({ renderGameUI }) => renderGameUI(container, wizardData));
+      console.log("Finishing wizard with data:", wizardData);
+      import("./gameUI.js")
+        .then(({ renderGameUI }) => {
+          console.log("Loaded gameUI.js successfully");
+          renderGameUI(container, wizardData);
+        })
+        .catch(err => {
+          console.error("Failed to load gameUI.js:", err);
+          alert("Error loading game UI. Check console for details.");
+        });
     }
   });
 
