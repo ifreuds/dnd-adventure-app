@@ -47,7 +47,7 @@ export async function generateNarration(context) {
         ],
         response_format: { type: "json_object" },
         temperature: 0.8,
-        max_tokens: 800
+        max_completion_tokens: 800
       })
     });
 
@@ -126,7 +126,7 @@ function formatSceneLog(sceneLog = []) {
   }
 
   return sceneLog.map((turn, idx) =>
-    `Turn ${idx + 1}: ${turn.playerAction} ’ ${turn.outcome}`
+    `Turn ${idx + 1}: ${turn.playerAction} ï¿½ ${turn.outcome}`
   ).join("\n");
 }
 
