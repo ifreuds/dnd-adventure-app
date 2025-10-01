@@ -59,6 +59,19 @@ export function renderGameUI(container, worldData = {}) {
                 <div>WIS: <span id="statWIS">10</span></div>
                 <div>CHA: <span id="statCHA">10</span></div>
               </div>
+              <hr style="border-color: #333; margin: 10px 0;">
+              <p style="font-size: 0.9em; color: #a9a9a9;"><strong>Skills & Abilities</strong></p>
+              <div id="skillsList" style="font-size: 0.85em;">
+                <div style="margin-bottom: 6px;">
+                  <span style="color: #4CAF50;">⚡</span> Quick Strike (3/3)
+                </div>
+                <div style="margin-bottom: 6px;">
+                  <span style="color: #2196F3;">🛡️</span> Defensive Stance (1/1)
+                </div>
+                <div style="margin-bottom: 6px;">
+                  <span style="color: #FFA500;">🔥</span> Power Attack (2/2)
+                </div>
+              </div>
             </div>
           </div>
 
@@ -69,7 +82,7 @@ export function renderGameUI(container, worldData = {}) {
             <button id="rollDiceBtn" style="width: 100%; padding: 12px; font-size: 1.1em;" disabled>
               Roll d20
             </button>
-            <div id="diceResult" style="margin-top: 10px; text-align: center; font-size: 1.5em; color: #4CAF50;">
+            <div id="diceResult" style="margin-top: 10px; text-align: center; font-size: 1.5em; color: #4CAF50; transition: transform 0.2s ease;">
               <!-- Dice result will appear here -->
             </div>
           </div>
@@ -177,18 +190,41 @@ export function renderGameUI(container, worldData = {}) {
   el.rollDiceBtn.addEventListener("click", () => {
     if (!diceActive) return;
 
-    const roll = Math.floor(Math.random() * 20) + 1;
-    el.diceResult.textContent = `<� ${roll}`;
-    el.diceResult.style.color = roll >= 15 ? "#4CAF50" : roll >= 10 ? "#FFA500" : "#F44336";
-
     el.rollDiceBtn.disabled = true;
-    diceActive = false;
 
-    // Placeholder outcome
-    setTimeout(() => {
-      addNarration(`You rolled a ${roll}! ${roll >= 13 ? "Success! The path ahead clears." : "The mist thickens, but you press on."}`);
-      renderChoices(["Continue forward", "Turn back", "Rest here"]);
-    }, 1000);
+    // Animate dice roll with number cycling
+    const finalRoll = Math.floor(Math.random() * 20) + 1;
+    let cycles = 0;
+    const maxCycles = 15;
+
+    const interval = setInterval(() => {
+      const randomNum = Math.floor(Math.random() * 20) + 1;
+      el.diceResult.textContent = `🎲 ${randomNum}`;
+      el.diceResult.style.color = "#FFA500";
+      el.diceResult.style.transform = "scale(1.2)";
+
+      cycles++;
+      if (cycles >= maxCycles) {
+        clearInterval(interval);
+
+        // Show final result with animation
+        el.diceResult.textContent = `🎲 ${finalRoll}`;
+        el.diceResult.style.color = finalRoll >= 15 ? "#4CAF50" : finalRoll >= 10 ? "#FFA500" : "#F44336";
+        el.diceResult.style.transform = "scale(1.5)";
+
+        setTimeout(() => {
+          el.diceResult.style.transform = "scale(1)";
+        }, 200);
+
+        diceActive = false;
+
+        // Placeholder outcome
+        setTimeout(() => {
+          addNarration(`You rolled a ${finalRoll}! ${finalRoll >= 13 ? "Success! The path ahead clears." : "The mist thickens, but you press on."}`);
+          renderChoices(["Continue forward", "Turn back", "Rest here"]);
+        }, 800);
+      }
+    }, 80);
   });
 
   el.modeToggleBtn.addEventListener("click", () => {
