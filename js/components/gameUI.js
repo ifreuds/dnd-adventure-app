@@ -320,14 +320,14 @@ export function renderGameUI(container, worldData = {}) {
       // Simulate API call (placeholder - will connect to imageService.js later)
       setTimeout(() => {
         // Use placeholder image service (placeholder.com)
-        currentImageUrl = \`https://via.placeholder.com/512x512/1a1a1a/4CAF50?text=Generated+Image\`;
+        currentImageUrl = `https://via.placeholder.com/512x512/1a1a1a/4CAF50?text=Generated+Image`;
 
-        imageContainer.innerHTML = \`
+        imageContainer.innerHTML = `
           <div class="generated-image-container">
-            <img src="\${currentImageUrl}" alt="Generated image" class="generated-image" />
-            <p class="muted" style="margin-top: 10px; font-size: 0.85em;">Prompt: \${prompt}</p>
+            <img src="${currentImageUrl}" alt="Generated image" class="generated-image" />
+            <p class="muted" style="margin-top: 10px; font-size: 0.85em;">Prompt: ${prompt}</p>
           </div>
-        \`;
+        `;
 
         generateBtn.disabled = false;
         saveImageBtn.style.display = "inline-block";
@@ -352,7 +352,7 @@ export function renderGameUI(container, worldData = {}) {
   function openGalleryModal() {
     const modal = document.createElement("div");
     modal.className = "modal-overlay";
-    modal.innerHTML = \`
+    modal.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
           <h2>Image Gallery</h2>
@@ -365,7 +365,7 @@ export function renderGameUI(container, worldData = {}) {
           <button id="closeGalleryBtn">Close</button>
         </div>
       </div>
-    \`;
+    `;
 
     document.body.appendChild(modal);
 
@@ -378,18 +378,18 @@ export function renderGameUI(container, worldData = {}) {
       galleryGrid.innerHTML = '<div class="gallery-empty">No images saved yet. Generate and save some images to see them here!</div>';
     } else {
       galleryGrid.className = "gallery-grid";
-      galleryGrid.innerHTML = savedImages.map((img, idx) => \`
-        <div class="gallery-item" data-idx="\${idx}">
-          <img src="\${img.url}" alt="\${img.prompt}" />
+      galleryGrid.innerHTML = savedImages.map((img, idx) => `
+        <div class="gallery-item" data-idx="${idx}">
+          <img src="${img.url}" alt="${img.prompt}" />
         </div>
-      \`).join("");
+      `).join("");
 
       // Click to view full image
       galleryGrid.querySelectorAll(".gallery-item").forEach(item => {
         item.addEventListener("click", () => {
           const idx = parseInt(item.getAttribute("data-idx"));
           const image = savedImages[idx];
-          alert(\`Image: \${image.prompt}\\nSaved: \${new Date(image.timestamp).toLocaleString()}\`);
+          alert(`Image: ${image.prompt}\nSaved: ${new Date(image.timestamp).toLocaleString()}`);
           // Later: could open a full-size preview modal
         });
       });
