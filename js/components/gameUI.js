@@ -112,6 +112,7 @@ export function renderGameUI(container, worldData = {}) {
   // Placeholder data
   let currentMode = "Normal";
   let diceActive = false;
+  let savedImages = []; // Store generated images for gallery
 
   // Initialize with placeholder narration
   addNarration("You stand at the entrance of a dark forest. The trees loom overhead, their branches twisted like grasping hands. A faint mist swirls around your feet, and you hear distant whispers on the wind.");
@@ -228,9 +229,7 @@ export function renderGameUI(container, worldData = {}) {
   });
 
   el.modeToggleBtn.addEventListener("click", () => {
-    currentMode = currentMode === "Normal" ? "Romance" : "Normal";
-    el.modeToggleBtn.textContent = `Mode: ${currentMode}`;
-    el.modeToggleBtn.style.backgroundColor = currentMode === "Romance" ? "#8B0000" : "#1e1e1e";
+    alert("Romance mode is not yet implemented. This feature will be added in a future update.");
   });
 
   el.settingsBtn.addEventListener("click", () => {
@@ -239,11 +238,11 @@ export function renderGameUI(container, worldData = {}) {
   });
 
   el.imageGenBtn.addEventListener("click", () => {
-    alert("Image Generation (placeholder)");
+    openImageGenModal();
   });
 
   el.galleryBtn.addEventListener("click", () => {
-    alert("Gallery (placeholder)");
+    openGalleryModal();
   });
 
   el.menuBtn.addEventListener("click", () => {
@@ -257,5 +256,158 @@ export function renderGameUI(container, worldData = {}) {
   }
   if (worldData.characterConcept) {
     el.charClass.textContent = worldData.characterConcept;
+  }
+
+  // Modal Functions
+  function openImageGenModal() {
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Generate Image</h2>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="muted" style="margin-bottom: 12px;">Describe the scene you want to visualize:</p>
+          <textarea
+            id="imagePrompt"
+            class="image-prompt-input"
+            placeholder="Example: A dark forest at twilight with twisted trees and glowing eyes in the shadows..."
+          ></textarea>
+          <div id="imageContainer"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="generateBtn">Generate Image</button>
+          <button id="saveImageBtn" style="display: none;">Save to Gallery</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const closeBtn = modal.querySelector(".modal-close-btn");
+    const generateBtn = modal.querySelector("#generateBtn");
+    const saveImageBtn = modal.querySelector("#saveImageBtn");
+    const imagePrompt = modal.querySelector("#imagePrompt");
+    const imageContainer = modal.querySelector("#imageContainer");
+
+    let currentImageUrl = null;
+
+    // Close modal
+    closeBtn.addEventListener("click", () => {
+      modal.remove();
+    });
+
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+
+    // Generate image (placeholder)
+    generateBtn.addEventListener("click", () => {
+      const prompt = imagePrompt.value.trim();
+      if (!prompt) {
+        alert("Please enter a description for the image.");
+        return;
+      }
+
+      // Show loading state
+      imageContainer.innerHTML = '<div class="image-loading">Generating image... (placeholder)</div>';
+      generateBtn.disabled = true;
+
+      // Simulate API call (placeholder - will connect to imageService.js later)
+      setTimeout(() => {
+        // Use placeholder image service (placeholder.com)
+        currentImageUrl = \`https://via.placeholder.com/512x512/1a1a1a/4CAF50?text=Generated+Image\`;
+
+        imageContainer.innerHTML = \`
+          <div class="generated-image-container">
+            <img src="\${currentImageUrl}" alt="Generated image" class="generated-image" />
+            <p class="muted" style="margin-top: 10px; font-size: 0.85em;">Prompt: \${prompt}</p>
+          </div>
+        \`;
+
+        generateBtn.disabled = false;
+        saveImageBtn.style.display = "inline-block";
+      }, 2000);
+    });
+
+    // Save to gallery
+    saveImageBtn.addEventListener("click", () => {
+      if (currentImageUrl) {
+        savedImages.push({
+          url: currentImageUrl,
+          prompt: imagePrompt.value.trim(),
+          timestamp: new Date().toISOString()
+        });
+        alert("Image saved to gallery!");
+        saveImageBtn.disabled = true;
+        saveImageBtn.textContent = "Saved ✓";
+      }
+    });
+  }
+
+  function openGalleryModal() {
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+    modal.innerHTML = \`
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Image Gallery</h2>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="galleryGrid"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="closeGalleryBtn">Close</button>
+        </div>
+      </div>
+    \`;
+
+    document.body.appendChild(modal);
+
+    const closeBtn = modal.querySelector(".modal-close-btn");
+    const closeGalleryBtn = modal.querySelector("#closeGalleryBtn");
+    const galleryGrid = modal.querySelector("#galleryGrid");
+
+    // Render gallery
+    if (savedImages.length === 0) {
+      galleryGrid.innerHTML = '<div class="gallery-empty">No images saved yet. Generate and save some images to see them here!</div>';
+    } else {
+      galleryGrid.className = "gallery-grid";
+      galleryGrid.innerHTML = savedImages.map((img, idx) => \`
+        <div class="gallery-item" data-idx="\${idx}">
+          <img src="\${img.url}" alt="\${img.prompt}" />
+        </div>
+      \`).join("");
+
+      // Click to view full image
+      galleryGrid.querySelectorAll(".gallery-item").forEach(item => {
+        item.addEventListener("click", () => {
+          const idx = parseInt(item.getAttribute("data-idx"));
+          const image = savedImages[idx];
+          alert(\`Image: \${image.prompt}\\nSaved: \${new Date(image.timestamp).toLocaleString()}\`);
+          // Later: could open a full-size preview modal
+        });
+      });
+    }
+
+    // Close modal
+    closeBtn.addEventListener("click", () => {
+      modal.remove();
+    });
+
+    closeGalleryBtn.addEventListener("click", () => {
+      modal.remove();
+    });
+
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
   }
 }
