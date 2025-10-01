@@ -64,14 +64,24 @@ export async function generateNarration(context) {
 
     const data = await response.json();
     console.log("GPT Response:", data);
+    console.log("Message content:", data.choices[0].message.content);
+    console.log("Full message:", data.choices[0].message);
 
     // Parse the JSON response from GPT
+    const messageContent = data.choices[0].message.content;
+
+    if (!messageContent || messageContent.trim() === "") {
+      console.error("Empty response from GPT. Full data:", JSON.stringify(data, null, 2));
+      throw new Error("GPT returned an empty response. Check console for details.");
+    }
+
     let result;
     try {
-      result = JSON.parse(data.choices[0].message.content);
+      result = JSON.parse(messageContent);
     } catch (parseError) {
-      console.error("Failed to parse GPT response:", data.choices[0].message.content);
-      throw new Error("GPT returned invalid JSON. Response: " + data.choices[0].message.content);
+      console.error("Failed to parse GPT response:", messageContent);
+      console.error("Parse error:", parseError);
+      throw new Error("GPT returned invalid JSON. Response: " + messageContent);
     }
 
     return {
