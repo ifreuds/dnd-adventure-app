@@ -203,10 +203,8 @@ export function renderWorldWizard(container) {
       currentStep++;
       render();
     } else {
-      // Finish placeholder: later this will write initial Save File + Summary
-      alert("Wizard complete (placeholder). Returning to Entry for now.");
-      // (Optional) navigate back to entry without reloading:
-      import("./entry.js").then(({ renderEntry }) => renderEntry(container));
+      // Finish: Navigate to Main Game UI with wizard data
+      import("./gameUI.js").then(({ renderGameUI }) => renderGameUI(container, wizardData));
     }
   });
 
