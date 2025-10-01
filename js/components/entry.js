@@ -1,3 +1,5 @@
+import { renderWorldWizard } from "./worldWizard.js";
+
 export function renderEntry(container) {
   container.innerHTML = `
     <div style="text-align:center; margin-top:20%;">
@@ -8,7 +10,7 @@ export function renderEntry(container) {
   `;
 
   document.getElementById("newWorldBtn").addEventListener("click", () => {
-    alert("New World flow will go here.");
+    renderWorldWizard(container);
   });
 
   document.getElementById("loadWorldBtn").addEventListener("click", () => {
