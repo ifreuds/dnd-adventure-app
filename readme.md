@@ -140,15 +140,46 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
 ---
 
 ## Current Status
-- Repo + hosting live.  
-- Entry screen working.  
-- World Creation Wizard skeleton implemented (sidebar + panels + navigation).  
+
+### ✅ Completed (Frontend Skeleton)
+- **Entry Screen** - New World / Load World buttons with full navigation
+- **World Creation Wizard** - 4-step wizard with input fields and live-updating Living File
+  - Step 1: Theme & Tone (3 input fields)
+  - Step 2: Rules & Mechanics (1 input field)
+  - Step 3: NPCs & Factions (3 input fields)
+  - Step 4: Character Creation (3 input fields)
+  - Data persists across step navigation
+  - Finishes into Main Game UI with wizard data
+- **Main Game UI** - Complete game interface
+  - Chat-based narration with choice buttons + free text input
+  - Character panel (name, class, HP, stats, skills/abilities)
+  - Animated d20 dice roller (number cycling animation)
+  - Top bar: Save, Settings, Mode, Image Gen, Gallery, Menu
+- **Modal Systems**
+  - Image Generation modal (text prompt → placeholder image → save to gallery)
+  - Gallery modal (grid view of saved images)
+  - Load World modal (list of saved games with metadata)
+- **Navigation** - All flows working
+  - Entry → Wizard → Game ✅
+  - Entry → Load World → Game ✅
+  - Game → Menu → Entry ✅
+  - Game → Settings → Wizard ✅
+- **Romance Mode** - Warning message (not yet implemented)
+
+### ❌ Not Yet Implemented (Backend Integration)
+- GPT API integration (placeholder responses only)
+- Supabase database connection (placeholder save/load)
+- Image generation API (using placeholder images)
+- Autosave system (every turn + checkpoint saves)
+- Real dice roll outcomes affecting story
+- Romance mode separate AI model
 
 ---
 
 ## Next Steps
-1. Add input field to Conversation Panel → update Living File live.  
-2. Build Main Game UI skeleton (chat, sidebar, topbar).  
-3. Connect GPT API (replace static placeholders).  
-4. Connect Supabase (autosave + load).  
-5. Add advanced features (Romance, Gallery, etc.).  
+1. **Connect GPT API** - Replace placeholder narration with real DM responses
+2. **Connect Supabase** - Implement save/load system (Scene Log, Save File, Progress Summary)
+3. **Wire up Image Generation API** - Real image generation from prompts
+4. **Implement Autosave** - Every turn + checkpoint (20 turns) saves
+5. **Add Romance Mode AI** - Separate model for mature content
+6. **Polish & Testing** - End-to-end gameplay testing  

@@ -51,12 +51,12 @@ The game uses Supabase to persist three types of data:
 
 The wizard uses a **two-panel collaborative design**:
 
-- **Left Panel (Conversation)**: Player provides input, AI makes proposals/refinements
-- **Right Panel (Living File)**: Structured summary that updates in real-time as conversation progresses
+- **Left Panel (Conversation)**: Shows step description and input fields for user to fill out
+- **Right Panel (Living File)**: Structured summary that updates in real-time as user types
 - **Sidebar**: Shows 4 clickable steps (Theme & Tone → Rules & Mechanics → NPCs & Factions → Character Creation)
-- **Navigation**: Back/Next buttons, autosave at each step, finalization creates initial Save File + Progress Summary + empty Scene Log
+- **Navigation**: Back/Next buttons, data persists across steps, Finish button navigates to Main Game UI with wizard data
 
-Current implementation is static placeholders; AI conversation integration is a next step.
+**Current implementation**: User fills input fields manually. **Future**: AI conversation to collaboratively build world via chat, with AI extracting structured data to Living File.
 
 ## Game Mechanics
 
@@ -76,17 +76,46 @@ Current implementation is static placeholders; AI conversation integration is a 
 
 ## Current Implementation Status
 
-- ✅ Entry screen with navigation
-- ✅ World Wizard skeleton (4-step sidebar, dual panels, Next/Back navigation)
-- ❌ GPT API integration (placeholder only)
-- ❌ Supabase connection (placeholder only)
-- ❌ Main game UI (not yet built)
-- ❌ Romance mode, image generation, gallery (not yet built)
+### ✅ Frontend Complete
+- **Entry Screen** - New World and Load World buttons
+- **World Wizard** - 4-step creation with input fields, live-updating Living File, data persistence across steps
+- **Main Game UI** - Chat narration, choice buttons, free text input, character panel (stats + skills), animated d20 dice roller
+- **Top Bar** - Save, Settings, Mode toggle, Image Gen, Gallery, Menu (all functional)
+- **Modals** - Image generation modal, gallery modal, load world modal
+- **Navigation** - All flows working (Entry ↔ Wizard ↔ Game)
+
+### ❌ Backend Integration Needed
+- **GPT API** - Placeholder responses only (js/services/gpt.js exists but not connected)
+- **Supabase** - Placeholder save/load (js/services/supabase.js exists but not connected)
+- **Image Generation API** - Using placeholder images (js/services/imageService.js exists but not connected)
+- **Autosave System** - Not yet implemented (every turn + checkpoint saves)
+- **Romance Mode AI** - Shows warning, not implemented
+
+## UI Features
+
+### Modals
+All modals use overlay pattern (no full page replacement):
+- **Image Generation Modal** - Textarea for prompt, generate button (2s delay), displays placeholder image, save to gallery
+- **Gallery Modal** - Grid of saved images (150px thumbnails), click to view details, empty state message
+- **Load World Modal** - List of saved worlds with metadata (character, turns, timestamp), load button per world
+
+### Animations
+- **Dice Roll**: Numbers cycle 1-20 at 80ms intervals (15 cycles), final result scales up 1.5x then back to 1x, color-coded by result (green 15+, orange 10-14, red <10)
+- **Modal Fade-in**: 0.2s opacity fade + 0.3s slide-down from -50px
+
+### Navigation Flow
+- Entry → New World → Wizard (4 steps) → Game UI
+- Entry → Load World → Modal (select save) → Game UI
+- Game UI → Settings → Wizard (with current data)
+- Game UI → Menu → Entry
+- Game UI → Save (manual save alert)
 
 ## Code Patterns
 
 - **Vanilla JavaScript** with ES6 modules (no framework, no build step)
 - **Component pattern**: Each component exports a `render[ComponentName](container)` function
+- **Modal pattern**: Created as DOM elements, appended to body, removed on close
 - **Inline styles**: Minimal CSS in styles.css, some inline styles for layout
 - **Event-driven navigation**: Components handle button clicks and call other render functions
 - **Import-on-demand**: Dynamic imports used for navigation (e.g., `import("./entry.js").then(...)`)
+- **State management**: Local variables in component scope (e.g., `wizardData`, `savedImages`)

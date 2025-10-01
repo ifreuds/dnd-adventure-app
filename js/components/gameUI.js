@@ -1,3 +1,5 @@
+import { generateNarration } from "../services/gpt.js";
+
 export function renderGameUI(container, worldData = {}) {
   container.innerHTML = `
     <div class="game-layout">
@@ -111,13 +113,19 @@ export function renderGameUI(container, worldData = {}) {
     charHP: container.querySelector("#charHP"),
   };
 
-  // Placeholder data
+  // Game state
   let currentMode = "Normal";
   let diceActive = false;
   let savedImages = []; // Store generated images for gallery
+  let sceneLog = []; // Track recent turns for GPT context
+  let pendingDiceRoll = null; // Store dice roll context
 
-  // Initialize with placeholder narration
-  addNarration("You stand at the entrance of a dark forest. The trees loom overhead, their branches twisted like grasping hands. A faint mist swirls around your feet, and you hear distant whispers on the wind.");
+  // Initialize with starting narration
+  const startingNarration = worldData.theme
+    ? `Welcome to ${worldData.theme || "your adventure"}! Your journey begins...`
+    : "You stand at the entrance of a dark forest. The trees loom overhead, their branches twisted like grasping hands. A faint mist swirls around your feet, and you hear distant whispers on the wind.";
+
+  addNarration(startingNarration);
 
   // Placeholder choices
   const placeholderChoices = [
@@ -150,7 +158,7 @@ export function renderGameUI(container, worldData = {}) {
     });
   }
 
-  function handlePlayerAction(action) {
+  async function handlePlayerAction(action) {
     // Add player action to chat
     const playerDiv = document.createElement("div");
     playerDiv.className = "player-message";
@@ -161,16 +169,76 @@ export function renderGameUI(container, worldData = {}) {
     // Clear input
     el.freeTextInput.value = "";
 
-    // Placeholder response (will be replaced with GPT API call)
-    setTimeout(() => {
-      addNarration("You take a step forward. The forest seems to respond to your presence, and the mist grows thicker. What happens next depends on fate...");
+    // Disable choices while processing
+    el.choiceButtons.innerHTML = '<div class="image-loading">The DM is thinking...</div>';
+    el.freeTextInput.disabled = true;
+    el.submitActionBtn.disabled = true;
 
-      // Simulate enabling dice roll
-      diceActive = true;
-      el.rollDiceBtn.disabled = false;
-      el.diceResult.textContent = "Roll needed!";
-      el.diceResult.style.color = "#FFA500";
-    }, 500);
+    try {
+      // Call GPT API
+      const context = {
+        worldTheme: worldData.theme || worldData.toneTags || "Fantasy adventure",
+        character: {
+          name: worldData.characterName || "Hero",
+          class: worldData.characterConcept || "Adventurer",
+          stats: {
+            STR: 10, DEX: 10, CON: 10, INT: 10, WIS: 10, CHA: 10
+          }
+        },
+        sceneLog: sceneLog.slice(-8), // Last 8 turns
+        playerAction: action
+      };
+
+      const result = await generateNarration(context);
+
+      // Add to scene log
+      sceneLog.push({
+        playerAction: action,
+        outcome: result.narration,
+        diceRoll: null
+      });
+
+      // Keep scene log to last 10 turns
+      if (sceneLog.length > 10) {
+        sceneLog.shift();
+      }
+
+      // Display narration
+      addNarration(result.narration);
+
+      // Handle dice roll if required
+      if (result.diceRequired) {
+        diceActive = true;
+        pendingDiceRoll = {
+          dc: result.dc,
+          context: result.diceContext
+        };
+        el.rollDiceBtn.disabled = false;
+        el.diceResult.textContent = result.diceContext || "Roll needed!";
+        el.diceResult.style.color = "#FFA500";
+        renderChoices([]); // No choices until dice is rolled
+      } else {
+        // Show new choices
+        renderChoices(result.choices);
+      }
+
+      // Re-enable input
+      el.freeTextInput.disabled = false;
+      el.submitActionBtn.disabled = false;
+
+    } catch (error) {
+      console.error("Error generating narration:", error);
+
+      // Show error message
+      addNarration(`[Error: ${error.message}. ${error.message.includes("API key") ? "Please set your API key in Settings." : "Please try again."}]`);
+
+      // Restore placeholder choices
+      renderChoices(["Try again", "Check settings", "Continue"]);
+
+      // Re-enable input
+      el.freeTextInput.disabled = false;
+      el.submitActionBtn.disabled = false;
+    }
   }
 
   // Event Listeners
@@ -221,10 +289,55 @@ export function renderGameUI(container, worldData = {}) {
 
         diceActive = false;
 
-        // Placeholder outcome
-        setTimeout(() => {
-          addNarration(`You rolled a ${finalRoll}! ${finalRoll >= 13 ? "Success! The path ahead clears." : "The mist thickens, but you press on."}`);
-          renderChoices(["Continue forward", "Turn back", "Rest here"]);
+        // Handle dice outcome with GPT
+        setTimeout(async () => {
+          const dc = pendingDiceRoll?.dc || 13;
+          const success = finalRoll >= dc;
+
+          // Update scene log with dice result
+          if (sceneLog.length > 0) {
+            sceneLog[sceneLog.length - 1].diceRoll = {
+              roll: finalRoll,
+              dc: dc,
+              success: success
+            };
+          }
+
+          // Generate outcome narration
+          try {
+            const context = {
+              worldTheme: worldData.theme || worldData.toneTags || "Fantasy adventure",
+              character: {
+                name: worldData.characterName || "Hero",
+                class: worldData.characterConcept || "Adventurer"
+              },
+              sceneLog: sceneLog.slice(-8),
+              playerAction: `[Dice Roll: ${finalRoll} vs DC ${dc}] ${success ? "SUCCESS" : "FAILURE"} on ${pendingDiceRoll?.context || "check"}`
+            };
+
+            const result = await generateNarration(context);
+
+            addNarration(result.narration);
+            renderChoices(result.choices);
+
+            // Add outcome to scene log
+            sceneLog.push({
+              playerAction: context.playerAction,
+              outcome: result.narration,
+              diceRoll: null
+            });
+
+          } catch (error) {
+            // Fallback if API fails
+            const outcomeText = success
+              ? `You rolled a ${finalRoll}! Success! ${pendingDiceRoll?.context || "You overcome the challenge."}`
+              : `You rolled a ${finalRoll}. Failure, but the story continues...`;
+
+            addNarration(outcomeText);
+            renderChoices(["Continue", "Try something else", "Rest"]);
+          }
+
+          pendingDiceRoll = null;
         }, 800);
       }
     }, 80);
@@ -240,10 +353,7 @@ export function renderGameUI(container, worldData = {}) {
   });
 
   el.settingsBtn.addEventListener("click", () => {
-    // Return to World Wizard with current world data
-    import("./worldWizard.js").then(({ renderWorldWizard }) => {
-      renderWorldWizard(container, worldData);
-    });
+    openSettingsModal();
   });
 
   el.imageGenBtn.addEventListener("click", () => {
@@ -419,6 +529,119 @@ export function renderGameUI(container, worldData = {}) {
       if (e.target === modal) {
         modal.remove();
       }
+    });
+  }
+
+  function openSettingsModal() {
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+
+    // Get current API key from localStorage
+    const currentApiKey = localStorage.getItem("openai_api_key") || "";
+
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Settings</h2>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h3 style="margin-top: 0;">OpenAI API Key</h3>
+          <p class="muted" style="font-size: 0.9em; margin-bottom: 12px;">
+            Enter your OpenAI API key to enable GPT-powered narration. Your key is stored locally in your browser.
+          </p>
+          <input
+            type="password"
+            id="apiKeyInput"
+            value="${currentApiKey}"
+            placeholder="sk-proj-..."
+            style="width: 100%; padding: 10px; background: #1a1a1a; color: #e0e0e0; border: 1px solid #333; border-radius: 4px; font-family: monospace; margin-bottom: 8px;"
+          />
+          <p class="muted" style="font-size: 0.85em;">
+            Don't have an API key? <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #4CAF50;">Get one here</a>
+          </p>
+          <div id="apiKeyStatus" style="margin-top: 12px; padding: 10px; border-radius: 4px; display: none;"></div>
+
+          <hr style="border-color: #333; margin: 20px 0;">
+
+          <h3>World Settings</h3>
+          <button id="editWorldBtn" style="width: 100%;">Edit World (Return to Wizard)</button>
+        </div>
+        <div class="modal-footer">
+          <button id="saveSettingsBtn">Save</button>
+          <button id="cancelSettingsBtn">Cancel</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const closeBtn = modal.querySelector(".modal-close-btn");
+    const saveBtn = modal.querySelector("#saveSettingsBtn");
+    const cancelBtn = modal.querySelector("#cancelSettingsBtn");
+    const editWorldBtn = modal.querySelector("#editWorldBtn");
+    const apiKeyInput = modal.querySelector("#apiKeyInput");
+    const apiKeyStatus = modal.querySelector("#apiKeyStatus");
+
+    // Close modal
+    function closeModal() {
+      modal.remove();
+    }
+
+    closeBtn.addEventListener("click", closeModal);
+    cancelBtn.addEventListener("click", closeModal);
+
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Save settings
+    saveBtn.addEventListener("click", () => {
+      const apiKey = apiKeyInput.value.trim();
+
+      if (apiKey) {
+        // Validate API key format (basic check)
+        if (!apiKey.startsWith("sk-")) {
+          apiKeyStatus.style.display = "block";
+          apiKeyStatus.style.background = "#8B0000";
+          apiKeyStatus.style.color = "#fff";
+          apiKeyStatus.textContent = "⚠️ Invalid API key format. OpenAI keys start with 'sk-'";
+          return;
+        }
+
+        // Save to localStorage
+        localStorage.setItem("openai_api_key", apiKey);
+
+        apiKeyStatus.style.display = "block";
+        apiKeyStatus.style.background = "#1a4d1a";
+        apiKeyStatus.style.color = "#4CAF50";
+        apiKeyStatus.textContent = "✓ API key saved successfully!";
+
+        setTimeout(() => {
+          closeModal();
+        }, 1500);
+      } else {
+        // Clear API key
+        localStorage.removeItem("openai_api_key");
+        apiKeyStatus.style.display = "block";
+        apiKeyStatus.style.background = "#1a4d1a";
+        apiKeyStatus.style.color = "#4CAF50";
+        apiKeyStatus.textContent = "✓ API key cleared";
+
+        setTimeout(() => {
+          closeModal();
+        }, 1500);
+      }
+    });
+
+    // Edit world button
+    editWorldBtn.addEventListener("click", () => {
+      modal.remove();
+      import("./worldWizard.js").then(({ renderWorldWizard }) => {
+        renderWorldWizard(container, worldData);
+      });
     });
   }
 }
