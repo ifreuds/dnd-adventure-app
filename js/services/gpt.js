@@ -3,7 +3,7 @@
  * Handles all communication with OpenAI API for DM narration
  */
 
-const GPT_MODEL = "gpt-5-mini";
+const GPT_MODEL = "gpt-5-mini-2025-08-07"; // Updated to use dated model name
 const API_ENDPOINT = "https://api.openai.com/v1/chat/completions";
 
 /**
