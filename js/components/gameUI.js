@@ -7,6 +7,7 @@ export function renderGameUI(container, worldData = {}) {
           <h2 style="margin: 0; font-size: 1.2em;">DnD Adventure</h2>
         </div>
         <div class="top-bar-right">
+          <button id="saveBtn">Save</button>
           <button id="settingsBtn">Settings</button>
           <button id="modeToggleBtn">Mode: Normal</button>
           <button id="imageGenBtn">Generate Image</button>
@@ -99,6 +100,7 @@ export function renderGameUI(container, worldData = {}) {
     submitActionBtn: container.querySelector("#submitActionBtn"),
     rollDiceBtn: container.querySelector("#rollDiceBtn"),
     diceResult: container.querySelector("#diceResult"),
+    saveBtn: container.querySelector("#saveBtn"),
     settingsBtn: container.querySelector("#settingsBtn"),
     modeToggleBtn: container.querySelector("#modeToggleBtn"),
     imageGenBtn: container.querySelector("#imageGenBtn"),
@@ -228,13 +230,20 @@ export function renderGameUI(container, worldData = {}) {
     }, 80);
   });
 
+  el.saveBtn.addEventListener("click", () => {
+    // Manual save (placeholder - will connect to Supabase later)
+    alert("Game saved! (placeholder)\n\nIn the full version, this will save:\n- Scene Log (current turns)\n- Save File (world, character, inventory)\n- Progress Summary");
+  });
+
   el.modeToggleBtn.addEventListener("click", () => {
     alert("Romance mode is not yet implemented. This feature will be added in a future update.");
   });
 
   el.settingsBtn.addEventListener("click", () => {
-    alert("Settings: Return to Wizard (placeholder)");
-    // Later: import("./worldWizard.js").then(({ renderWorldWizard }) => renderWorldWizard(container));
+    // Return to World Wizard with current world data
+    import("./worldWizard.js").then(({ renderWorldWizard }) => {
+      renderWorldWizard(container, worldData);
+    });
   });
 
   el.imageGenBtn.addEventListener("click", () => {
@@ -246,8 +255,10 @@ export function renderGameUI(container, worldData = {}) {
   });
 
   el.menuBtn.addEventListener("click", () => {
-    alert("Return to Menu (placeholder)");
-    // Later: import("./entry.js").then(({ renderEntry }) => renderEntry(container));
+    // Return to Entry screen (main menu)
+    import("./entry.js").then(({ renderEntry }) => {
+      renderEntry(container);
+    });
   });
 
   // Populate character info if worldData provided
