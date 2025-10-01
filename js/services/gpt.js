@@ -46,7 +46,8 @@ export async function generateNarration(context) {
           { role: "user", content: userPrompt }
         ],
         response_format: { type: "json_object" },
-        max_completion_tokens: 800
+        reasoning_effort: "minimal",  // Use minimal reasoning for faster, more concise responses
+        max_completion_tokens: 1500   // Increased to account for reasoning tokens + actual content
       })
     });
 
