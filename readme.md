@@ -166,20 +166,34 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
   - Game → Settings → Wizard ✅
 - **Romance Mode** - Warning message (not yet implemented)
 
-### ❌ Not Yet Implemented (Backend Integration)
-- GPT API integration (placeholder responses only)
-- Supabase database connection (placeholder save/load)
-- Image generation API (using placeholder images)
-- Autosave system (every turn + checkpoint saves)
-- Real dice roll outcomes affecting story
-- Romance mode separate AI model
+### ⚙️ Partially Implemented (Backend Integration)
+- **GPT API integration** - ✅ Working!
+  - Model: `gpt-5-mini-2025-08-07`
+  - Settings modal for API key (stored in localStorage)
+  - Scene log tracking (last 10 turns)
+  - Dice roll integration with GPT outcomes
+  - **Known issues with GPT-5-mini:**
+    - Cannot use `response_format: { type: "json_object" }` - causes empty responses
+    - Cannot customize `temperature` - only default (1) supported
+    - Uses `max_completion_tokens` instead of `max_tokens`
+    - Reasoning tokens can consume all tokens if not careful
+- **Supabase database connection** - ❌ Not yet connected (placeholder save/load)
+- **Image generation API** - ❌ Using placeholder images
+- **Autosave system** - ❌ Not yet implemented (every turn + checkpoint saves)
+- **Romance mode AI** - ❌ Shows warning, not implemented
 
 ---
 
 ## Next Steps
-1. **Connect GPT API** - Replace placeholder narration with real DM responses
-2. **Connect Supabase** - Implement save/load system (Scene Log, Save File, Progress Summary)
-3. **Wire up Image Generation API** - Real image generation from prompts
-4. **Implement Autosave** - Every turn + checkpoint (20 turns) saves
-5. **Add Romance Mode AI** - Separate model for mature content
-6. **Polish & Testing** - End-to-end gameplay testing  
+1. ✅ ~~**Connect GPT API**~~ - DONE! Working with gpt-5-mini-2025-08-07
+2. **Improve GPT Integration** - Fine-tune prompts for better JSON output reliability
+3. **Connect Supabase** - Implement save/load system (Scene Log, Save File, Progress Summary)
+4. **Wire up Image Generation API** - Real image generation from prompts
+5. **Implement Autosave** - Every turn + checkpoint (20 turns) saves
+6. **Add Romance Mode AI** - Separate model for mature content
+7. **Polish & Testing** - End-to-end gameplay testing
+
+## Session Notes (for next session)
+- GPT-5-mini integration working but needs prompt refinement for better JSON parsing
+- User has API key set up and working
+- Next: Either improve GPT prompts OR move to Supabase integration  

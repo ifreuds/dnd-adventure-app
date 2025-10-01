@@ -84,10 +84,23 @@ The wizard uses a **two-panel collaborative design**:
 - **Modals** - Image generation modal, gallery modal, load world modal
 - **Navigation** - All flows working (Entry ↔ Wizard ↔ Game)
 
-### ❌ Backend Integration Needed
-- **GPT API** - Placeholder responses only (js/services/gpt.js exists but not connected)
-- **Supabase** - Placeholder save/load (js/services/supabase.js exists but not connected)
-- **Image Generation API** - Using placeholder images (js/services/imageService.js exists but not connected)
+### ✅ Backend Integration - GPT API
+- **GPT API** - ✅ WORKING!
+  - Location: `js/services/gpt.js`
+  - Model: `gpt-5-mini-2025-08-07`
+  - API key stored in localStorage (user enters via Settings modal)
+  - System prompt includes world theme, character stats, recent scene log
+  - Returns narration, choices, dice requirements
+  - **Important GPT-5-mini quirks:**
+    - ❌ Do NOT use `response_format: { type: "json_object" }` - causes empty responses with all tokens used for reasoning
+    - ❌ Do NOT use `temperature` parameter - only default (1) is supported
+    - ✅ Use `max_completion_tokens` (not `max_tokens`)
+    - ✅ Set high token limit (2000+) to account for reasoning tokens
+    - ✅ Parse JSON from response (handles both raw JSON and markdown code blocks)
+
+### ❌ Backend Integration - Not Yet Connected
+- **Supabase** - Placeholder save/load (js/services/supabase.js exists but empty)
+- **Image Generation API** - Using placeholder images (js/services/imageService.js exists but empty)
 - **Autosave System** - Not yet implemented (every turn + checkpoint saves)
 - **Romance Mode AI** - Shows warning, not implemented
 
@@ -118,4 +131,29 @@ All modals use overlay pattern (no full page replacement):
 - **Inline styles**: Minimal CSS in styles.css, some inline styles for layout
 - **Event-driven navigation**: Components handle button clicks and call other render functions
 - **Import-on-demand**: Dynamic imports used for navigation (e.g., `import("./entry.js").then(...)`)
-- **State management**: Local variables in component scope (e.g., `wizardData`, `savedImages`)
+- **State management**: Local variables in component scope (e.g., `wizardData`, `savedImages`, `sceneLog`)
+- **API integration**: Async/await with fetch API, error handling with try/catch, localStorage for API keys
+
+## GPT Integration Details
+
+### API Call Flow
+1. User takes action → `handlePlayerAction()` in gameUI.js
+2. Build context object (world theme, character, scene log)
+3. Call `generateNarration(context)` from gpt.js
+4. GPT returns JSON with narration, choices, dice requirements
+5. Update UI with narration and new choices
+6. Add turn to scene log (max 10 turns)
+
+### Scene Log Format
+```javascript
+{
+  playerAction: "Enter the forest cautiously",
+  outcome: "You step into the forest...",
+  diceRoll: { roll: 15, dc: 13, success: true } // null if no roll
+}
+```
+
+### Debugging Tips
+- Check browser console for "GPT Response:" logs
+- Look for `completion_tokens_details.reasoning_tokens` - if this equals total tokens, response will be empty
+- If JSON parsing fails, check if GPT wrapped response in markdown code blocks
