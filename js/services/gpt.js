@@ -45,9 +45,7 @@ export async function generateNarration(context) {
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        response_format: { type: "json_object" },
-        reasoning_effort: "minimal",  // Use minimal reasoning for faster, more concise responses
-        max_completion_tokens: 1500   // Increased to account for reasoning tokens + actual content
+        max_completion_tokens: 2000   // Much higher limit to ensure content gets through
       })
     });
 
@@ -78,11 +76,23 @@ export async function generateNarration(context) {
 
     let result;
     try {
+      // Try to parse as direct JSON first
       result = JSON.parse(messageContent);
     } catch (parseError) {
-      console.error("Failed to parse GPT response:", messageContent);
-      console.error("Parse error:", parseError);
-      throw new Error("GPT returned invalid JSON. Response: " + messageContent);
+      // If that fails, try to extract JSON from markdown code blocks
+      const jsonMatch = messageContent.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
+      if (jsonMatch) {
+        try {
+          result = JSON.parse(jsonMatch[1]);
+        } catch (e) {
+          console.error("Failed to parse extracted JSON:", jsonMatch[1]);
+          throw new Error("GPT returned malformed JSON. Response: " + messageContent);
+        }
+      } else {
+        console.error("Failed to parse GPT response:", messageContent);
+        console.error("Parse error:", parseError);
+        throw new Error("GPT returned invalid JSON. Response: " + messageContent);
+      }
     }
 
     return {
