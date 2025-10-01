@@ -51,12 +51,28 @@ export async function generateNarration(context) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || `API error: ${response.status}`);
+      let errorMessage = `API error: ${response.status}`;
+      try {
+        const error = await response.json();
+        errorMessage = error.error?.message || errorMessage;
+      } catch (e) {
+        // If error response isn't JSON, use status text
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
-    const result = JSON.parse(data.choices[0].message.content);
+    console.log("GPT Response:", data);
+
+    // Parse the JSON response from GPT
+    let result;
+    try {
+      result = JSON.parse(data.choices[0].message.content);
+    } catch (parseError) {
+      console.error("Failed to parse GPT response:", data.choices[0].message.content);
+      throw new Error("GPT returned invalid JSON. Response: " + data.choices[0].message.content);
+    }
 
     return {
       narration: result.narration || "The story continues...",
