@@ -45,7 +45,7 @@ export async function generateNarration(context) {
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        max_completion_tokens: 2000   // Much higher limit to ensure content gets through
+        max_completion_tokens: 3500   // High limit to account for reasoning tokens (GPT-5-mini uses ~2000 for reasoning)
       })
     });
 

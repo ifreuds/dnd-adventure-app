@@ -374,6 +374,10 @@ export function renderGameUI(container, worldData = {}) {
 
           // Generate outcome narration
           try {
+            // Extract just the check type without the long success/failure descriptions
+            const checkMatch = pendingDiceRoll?.context?.match(/^([A-Z][a-z]+\s*\([A-Za-z]+\)\s+check[^.]*)/);
+            const checkDescription = checkMatch ? checkMatch[1] : (pendingDiceRoll?.context || "check");
+
             const context = {
               worldTheme: worldData.theme || worldData.toneTags || "Fantasy adventure",
               character: {
@@ -381,7 +385,7 @@ export function renderGameUI(container, worldData = {}) {
                 class: worldData.characterConcept || "Adventurer"
               },
               sceneLog: sceneLog.slice(-8),
-              playerAction: `[Dice Roll: ${finalRoll} vs DC ${dc}] ${success ? "SUCCESS" : "FAILURE"} on ${pendingDiceRoll?.context || "check"}`
+              playerAction: `[Dice Roll: ${finalRoll} vs DC ${dc}] ${success ? "SUCCESS" : "FAILURE"} on ${checkDescription}`
             };
 
             // Route to appropriate API based on mode
