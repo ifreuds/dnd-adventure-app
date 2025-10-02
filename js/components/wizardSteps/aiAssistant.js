@@ -10,6 +10,18 @@ export async function callWorldBuildingAssistant(stepKey, userMessage, wizardDat
     throw new Error("No API key found. Please add your OpenAI API key in Settings.");
   }
 
+  // Build user inputs context for Step 0
+  let userInputsContext = '';
+  if (stepKey === 'step0') {
+    userInputsContext = `\n\nUSER'S INITIAL INPUTS:
+World Name: ${wizardData.worldName || '[Not provided]'}
+Genre/Theme: ${wizardData.worldGenre || '[Not provided]'}
+Main Conflict: ${wizardData.worldConflict || '[Not provided]'}
+Narrative Style: ${wizardData.narrativeStyle || '[Not provided]'}
+
+IMPORTANT: Use the Narrative Style "${wizardData.narrativeStyle}" in your conversational tone and Living File content.`;
+  }
+
   // Build context: existing Living Files from other steps
   const contextualInfo = [];
   if (wizardData.livingFiles.step0 && stepKey !== 'step0') contextualInfo.push(`World Context:\n${wizardData.livingFiles.step0}`);
@@ -23,13 +35,19 @@ export async function callWorldBuildingAssistant(stepKey, userMessage, wizardDat
 
   // Build chat history for context
   const chatHistory = wizardData.chatHistory[stepKey];
-  const previousMessages = chatHistory.slice(-6); // Last 6 messages for context
+  const previousMessages = chatHistory.slice(-8); // Last 8 messages for context (increased from 6)
+
+  // Construct system message with all context
+  const systemMessage = guidelines[stepKey] + userInputsContext + contextSection;
 
   const messages = [
-    { role: "system", content: guidelines[stepKey] + contextSection },
+    { role: "system", content: systemMessage },
     ...previousMessages,
     { role: "user", content: userMessage }
   ];
+
+  console.log(`🤖 Calling World Building AI (${stepKey})...`);
+  console.log(`📝 Chat history: ${previousMessages.length} messages`);
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -41,7 +59,7 @@ export async function callWorldBuildingAssistant(stepKey, userMessage, wizardDat
       body: JSON.stringify({
         model: "gpt-5-mini-2025-08-07",
         messages: messages,
-        max_completion_tokens: 3500
+        max_completion_tokens: 16000 // Increased from 3500 for world building
       })
     });
 
@@ -51,9 +69,12 @@ export async function callWorldBuildingAssistant(stepKey, userMessage, wizardDat
     }
 
     const data = await response.json();
+    console.log(`✅ AI response received (${data.usage?.total_tokens || 'unknown'} tokens)`);
+
     const messageContent = data.choices[0].message.content;
 
     if (!messageContent || messageContent.trim() === "") {
+      console.error("❌ Empty response from AI");
       throw new Error("AI returned an empty response. Please try again.");
     }
 
@@ -67,9 +88,12 @@ export async function callWorldBuildingAssistant(stepKey, userMessage, wizardDat
       if (jsonMatch) {
         result = JSON.parse(jsonMatch[1]);
       } else {
+        console.error("❌ Failed to parse AI response as JSON:", messageContent.substring(0, 200));
         throw new Error("AI returned invalid JSON format. Please try again.");
       }
     }
+
+    console.log(`📊 Coverage complete: ${result.coverageComplete}`);
 
     return {
       message: result.message || "I'm here to help build your world!",
@@ -78,7 +102,7 @@ export async function callWorldBuildingAssistant(stepKey, userMessage, wizardDat
     };
 
   } catch (error) {
-    console.error("World Building AI Error:", error);
+    console.error("❌ World Building AI Error:", error);
     throw error;
   }
 }

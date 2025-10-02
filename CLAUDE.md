@@ -182,9 +182,15 @@ When user completes pre-fill form and clicks "Generate":
     - Model: `gpt-5-mini-2025-08-07` (max_completion_tokens: 16000 for longer context)
     - Uses same API key from localStorage
     - Guidelines loaded from localStorage or defaults (per step)
-    - Context includes user's pre-fill inputs + chat history
+    - Context includes user's pre-fill inputs + chat history (last 8 messages)
     - Returns JSON: `{ "message": "...", "livingFile": "...", "coverageComplete": true/false }`
     - Auto-triggered on form submission (no manual "Continue" needed)
+    - **Enhanced prompts (v2)**:
+      - Passes user's Narrative Style explicitly in system prompt
+      - Better structured guidelines with clear formatting rules
+      - Enforces 1 question per response maximum
+      - Improved Living File format with consistent structure
+      - Better logging for debugging (console shows token usage)
 
 ### ✅ Backend Integration - Mature Mode (Grok API)
 - **Grok API integration** - ✅ Working!

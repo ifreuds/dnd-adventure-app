@@ -68,27 +68,18 @@ export function renderStep0Form(wizardData, el, onComplete) {
 }
 
 export function getStep0InitialMessage(wizardData) {
-  return `Perfect! I've created a draft Living File based on your inputs:
+  // This creates the FIRST auto-generated prompt sent to AI
+  // AI will respond with draft Living File + ONE question
+  return `I've filled out the basic world information:
 
-<strong>World Name:</strong> ${wizardData.worldName}
-<strong>Genre:</strong> ${wizardData.worldGenre}
-<strong>Main Conflict:</strong> ${wizardData.worldConflict}
-<strong>Narrative Style:</strong> ${wizardData.narrativeStyle}
+World Name: ${wizardData.worldName}
+Genre/Theme: ${wizardData.worldGenre}
+Main Conflict: ${wizardData.worldConflict}
+Narrative Style: ${wizardData.narrativeStyle}
 
-Check the <strong>Living File</strong> panel on the right — I've drafted the initial world context based on what you provided.
+Please create a draft Living File in the proper format, filling in what you can infer from these inputs. Mark any incomplete areas as "[To be defined]".
 
-Now let's refine it together! I'll help you add:
-- More details about the conflict origin
-- Main objectives (win/lose conditions)
-- Key locations (3-5 important places)
-- Opposing forces and factions
-
-<strong>Review the Living File, then:</strong>
-- If you want to expand on something, just tell me (e.g., "Add more about the two entities")
-- If you want to add something new, tell me what (e.g., "Let's define 3 key locations")
-- If it looks good, say "Continue" and I'll ask about the next area
-
-What would you like to add or refine first?`;
+Then ask me ONE specific question about what to expand on first.`;
 }
 
 export function buildStep0Context(wizardData, userMessage) {
