@@ -11,8 +11,26 @@ export function renderEntry(container) {
   `;
 
   document.getElementById("newWorldBtn").addEventListener("click", () => {
+    // Clear all wizard data for fresh start
+    clearWizardData();
     renderWorldWizard(container);
   });
+
+  function clearWizardData() {
+    // Clear chat histories
+    localStorage.removeItem('wizard_chat_step0');
+    localStorage.removeItem('wizard_chat_step1');
+    localStorage.removeItem('wizard_chat_step2');
+    localStorage.removeItem('wizard_chat_step3');
+
+    // Clear living files
+    localStorage.removeItem('wizard_livingFile_step0');
+    localStorage.removeItem('wizard_livingFile_step1');
+    localStorage.removeItem('wizard_livingFile_step2');
+    localStorage.removeItem('wizard_livingFile_step3');
+
+    // Note: We keep guidelines (wizard_guideline_stepX) since those are user customizations
+  }
 
   document.getElementById("loadWorldBtn").addEventListener("click", () => {
     openLoadWorldModal();
