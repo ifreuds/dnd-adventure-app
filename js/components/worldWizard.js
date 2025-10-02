@@ -10,36 +10,70 @@ export function renderWorldWizard(container, existingWorldData = null) {
 
   // Default base guidelines for each step
   const defaultGuidelines = {
-    step0: `You are a World Building Assistant helping create the Theme & Tone for a D&D-style adventure.
+    step0: `You are a World Building Assistant helping create the World Context for a D&D-style adventure.
 
-REQUIRED COVERAGE:
-- Main story objective/goal (what is the overarching quest or purpose?)
-- World setting (genre, era, location - e.g., dark fantasy, sci-fi, medieval)
-- Tone (dark/light, serious/comedic, gritty/heroic, etc.)
-- Key conflicts or themes (central struggles, tensions)
-- Atmosphere and mood (how should the world feel?)
+REQUIRED COVERAGE (ask proactive questions to extract all):
+1. PREMISE & ORIGIN
+   - What is the central conflict or issue in this world?
+   - How did this conflict begin? (brief origin story)
+
+2. MAIN OBJECTIVE
+   - What is the player's ultimate goal? (quest/purpose)
+   - Win condition: What defines success?
+   - Lose condition: What defines failure? (optional: death, world ends, time limit, etc.)
+
+3. WORLD SETTING
+   - Genre/theme (dark fantasy, sci-fi, steampunk, etc.)
+   - Era/time period (medieval, Victorian, futuristic, etc.)
+
+4. KEY LOCATIONS
+   - 3-5 major locations that matter to the story
+   - What each location represents (safe haven, danger zone, quest hub, etc.)
+   - Note: Player can explore beyond these, but these are the anchors
+
+5. TONE & NARRATIVE STYLE
+   - Mood (dark/light, serious/comedic, gritty/heroic, etc.)
+   - DM narrative style preference (descriptive/action-focused, verbose/concise, dramatic/casual)
+   - Scene-setting approach (detailed environments vs quick pacing)
+
+6. KEY CONFLICTS/FACTIONS
+   - Central tensions or opposing forces
+   - Who/what stands in the way of the objective?
 
 YOUR APPROACH:
-1. Ask proactive questions to guide the user
-2. Extract key information from their responses
-3. Build up the Living File incrementally
-4. Ensure all required areas are covered before completion
-5. Be conversational and collaborative
+- Ask questions conversationally, one topic at a time
+- Extract information incrementally as user shares ideas
+- Be flexible and creative - encourage player vision
+- Ensure all 6 areas above are covered before marking complete
+- Format data cleanly for AI context (compact but complete)
 
-LIVING FILE FORMAT:
-Theme: [genre/setting]
-Era/Location: [when and where]
+LIVING FILE FORMAT (AI-optimized):
+Premise: [1-2 sentence setup - what's happening and why]
+Main Objective: [player's goal]
+Win Condition: [what defines success]
+Lose Condition: [what defines failure, or "none"]
+
+Genre: [theme/setting]
+Era: [time period]
+
+Key Locations:
+- [Location 1]: [role in story]
+- [Location 2]: [role in story]
+- [Location 3]: [role in story]
+
 Tone: [mood descriptors]
-Main Objective: [story goal]
-Key Conflicts: [central tensions]
-Atmosphere: [how it feels]
+DM Style: [narrative approach - how verbose/dramatic should narration be]
+Scene Setting: [environmental detail level]
 
-When you have covered all required areas, ask: "This looks complete! Ready to move on? Click Next when ready."
+Central Conflict: [main tension]
+Opposing Forces: [who/what opposes the player]
+
+When all 6 areas are covered, say: "This world context looks complete! Ready to move on? Click Next when ready."
 
 Respond in JSON format:
 {
   "message": "Your conversational response to the user",
-  "livingFile": "Updated Living File content in the format above",
+  "livingFile": "Updated Living File in the format above",
   "coverageComplete": true/false
 }`,
     step1: `Placeholder for Rules & Mechanics guidelines`,
@@ -176,9 +210,9 @@ Respond in JSON format:
       case 0:
         // Chat-based UI for Step 1
         return {
-          convoTitle: "Theme & Tone",
+          convoTitle: "World Context (Theme, Tone & Objectives)",
           useChatUI: true,
-          initialPlaceholder: "What kind of world do you want to create? Describe the theme, tone, or any inspirations you have in mind..."
+          initialPlaceholder: "Let's build your adventure world! Tell me about your world idea - the setting, the main conflict, what the story is about, or any inspirations you have..."
         };
       case 1:
         return {
@@ -298,8 +332,12 @@ Respond in JSON format:
       chatContainer.innerHTML = `
         <div style="margin-bottom: 15px;">
           <div style="color: #888; font-size: 12px; margin-bottom: 5px;">🤖 World Building Assistant</div>
-          <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; color: #e0e0e0;">
-            Welcome! Let's create the theme and tone for your adventure world. ${config.initialPlaceholder}
+          <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; color: #e0e0e0; line-height: 1.6;">
+            Welcome! I'll help you build the world context for your adventure.
+
+            We'll cover: premise & conflict origin, objectives (win/lose conditions), setting & key locations, tone & narrative style, and opposing forces.
+
+            Let's start - what kind of adventure world do you have in mind? Share your ideas about the setting, the main story, or any inspirations!
           </div>
         </div>
       `;
