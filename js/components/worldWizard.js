@@ -788,23 +788,22 @@ Respond in JSON format:
   function contentFor(stepIdx) {
     switch (stepIdx) {
       case 0:
-        // Chat-based UI for Step 1
         return {
           convoTitle: "World Context (Theme, Tone & Objectives)",
-          useChatUI: true,
-          initialPlaceholder: "Let's build your adventure world! Tell me about your world idea - the setting, the main conflict, what the story is about, or any inspirations you have..."
+          useHybridUI: true,
+          initialPlaceholder: "Great! Now I'll help you build the full world context based on your inputs..."
         };
       case 1:
         return {
           convoTitle: "Rules & Mechanics",
-          useChatUI: true,
-          initialPlaceholder: "Let's define how your game works! Tell me your preferences for combat, progression, inventory, or accept defaults..."
+          useHybridUI: true,
+          initialPlaceholder: "Perfect! I'll help you define the game mechanics in detail..."
         };
       case 2:
         return {
           convoTitle: "NPCs & Factions",
-          useChatUI: true,
-          initialPlaceholder: "Let's create the NPCs and factions for your world! Tell me about key characters, their roles, or any ideas you have..."
+          useHybridUI: true,
+          initialPlaceholder: "Great! I'll help you create detailed NPCs with full romance support..."
         };
       case 3:
         return {
@@ -1054,12 +1053,269 @@ Remember: This is a mature game with romance. Physical descriptions should be vi
   function renderHybridUI(config) {
     const stepKey = `step${currentStep}`;
 
-    // Check if character data is filled
-    const isDataFilled = wizardData.characterName && wizardData.characterGender &&
-                         wizardData.characterRace && wizardData.characterClass &&
-                         wizardData.pointBuyStats;
+    // Determine which step we're on and what data is required
+    let isDataFilled = false;
+
+    if (currentStep === 0) {
+      isDataFilled = wizardData.worldName && wizardData.worldGenre && wizardData.worldConflict;
+    } else if (currentStep === 1) {
+      isDataFilled = wizardData.mechanicsApproach;
+    } else if (currentStep === 2) {
+      isDataFilled = wizardData.npcList && wizardData.npcList.length > 0 && wizardData.npcCount;
+    } else if (currentStep === 3) {
+      isDataFilled = wizardData.characterName && wizardData.characterGender &&
+                     wizardData.characterRace && wizardData.characterClass &&
+                     wizardData.pointBuyStats;
+    }
 
     if (!isDataFilled) {
+      // Render appropriate form based on step
+      if (currentStep === 0) {
+        renderStep0Form();
+      } else if (currentStep === 1) {
+        renderStep1Form();
+      } else if (currentStep === 2) {
+        renderStep2Form();
+      } else if (currentStep === 3) {
+        renderStep3Form();
+      }
+    } else {
+      // Show chat UI
+      renderHybridChat(config, stepKey);
+    }
+  }
+
+  function renderStep0Form() {
+    el.convoBody.innerHTML = `
+      <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+        <p style="color: #888; margin-bottom: 15px;">Fill out the basic world information, then the AI will help you expand it into a full world context.</p>
+      </div>
+    `;
+
+    el.inputArea.innerHTML = `
+      <div style="display: grid; gap: 15px; margin-bottom: 20px;">
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">World Name *</label>
+          <input type="text" id="worldName" value="${wizardData.worldName || ''}"
+                 placeholder="e.g., The Shattered Realms, Neo-Tokyo 2099"
+                 style="width: 100%; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Genre/Theme *</label>
+          <input type="text" id="worldGenre" value="${wizardData.worldGenre || ''}"
+                 placeholder="e.g., Dark Fantasy, Cyberpunk, Steampunk, Post-Apocalyptic"
+                 style="width: 100%; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Main Conflict (Brief) *</label>
+          <textarea id="worldConflict" placeholder="What's the central problem or threat? (1-2 sentences)"
+                    style="width: 100%; min-height: 60px; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px; resize: vertical;">${wizardData.worldConflict || ''}</textarea>
+        </div>
+      </div>
+
+      <button id="generateBtn" style="width: 100%; padding: 12px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px;">
+        🤖 Generate Full World Context
+      </button>
+    `;
+
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const worldName = document.getElementById('worldName').value.trim();
+      const worldGenre = document.getElementById('worldGenre').value.trim();
+      const worldConflict = document.getElementById('worldConflict').value.trim();
+
+      if (!worldName || !worldGenre || !worldConflict) {
+        alert('Please fill out all fields before generating.');
+        return;
+      }
+
+      wizardData.worldName = worldName;
+      wizardData.worldGenre = worldGenre;
+      wizardData.worldConflict = worldConflict;
+
+      render();
+    });
+  }
+
+  function renderStep1Form() {
+    el.convoBody.innerHTML = `
+      <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+        <p style="color: #888; margin-bottom: 15px;">Choose your approach for game mechanics. You can use balanced defaults or customize everything to your preference.</p>
+      </div>
+    `;
+
+    el.inputArea.innerHTML = `
+      <div style="display: grid; gap: 15px; margin-bottom: 20px;">
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Mechanics Approach *</label>
+          <select id="mechanicsApproach" style="width: 100%; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px;">
+            <option value="">Select...</option>
+            <option value="defaults" ${wizardData.mechanicsApproach === 'defaults' ? 'selected' : ''}>Use Balanced Defaults (Quick Setup)</option>
+            <option value="custom" ${wizardData.mechanicsApproach === 'custom' ? 'selected' : ''}>Customize Everything (Advanced)</option>
+          </select>
+        </div>
+        <div id="customNote" style="display: none; background: #2a2a2a; padding: 12px; border-radius: 4px; border-left: 3px solid #d97706;">
+          <p style="color: #e0e0e0; margin: 0; font-size: 14px;">
+            <strong>Custom Mode:</strong> The AI will help you define combat systems, progression curves, inventory rules, currency, companions, and relationship mechanics through conversation.
+          </p>
+        </div>
+        <div id="defaultsNote" style="display: none; background: #2a2a2a; padding: 12px; border-radius: 4px; border-left: 3px solid #059669;">
+          <p style="color: #e0e0e0; margin: 0; font-size: 14px;">
+            <strong>Defaults Include:</strong> D&D-style combat (d20), level 1-20 progression, key items inventory, single currency, companion system (max 2), relationship tracking (0-150+ points).
+          </p>
+        </div>
+      </div>
+
+      <button id="generateBtn" style="width: 100%; padding: 12px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px;">
+        🤖 Define Game Mechanics
+      </button>
+    `;
+
+    const approachSelect = document.getElementById('mechanicsApproach');
+    const customNote = document.getElementById('customNote');
+    const defaultsNote = document.getElementById('defaultsNote');
+
+    approachSelect.addEventListener('change', () => {
+      const value = approachSelect.value;
+      customNote.style.display = value === 'custom' ? 'block' : 'none';
+      defaultsNote.style.display = value === 'defaults' ? 'block' : 'none';
+    });
+
+    // Trigger on load if value exists
+    if (wizardData.mechanicsApproach) {
+      approachSelect.dispatchEvent(new Event('change'));
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const mechanicsApproach = approachSelect.value;
+
+      if (!mechanicsApproach) {
+        alert('Please select a mechanics approach.');
+        return;
+      }
+
+      wizardData.mechanicsApproach = mechanicsApproach;
+
+      render();
+    });
+  }
+
+  function renderStep2Form() {
+    if (!wizardData.npcList) {
+      wizardData.npcList = [{ name: '', role: '', gender: '' }];
+    }
+
+    el.convoBody.innerHTML = `
+      <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+        <p style="color: #888; margin-bottom: 15px;">Define the key NPCs for your world. The AI will expand each with detailed physical descriptions, backstory, relationship points, and romance options.</p>
+      </div>
+    `;
+
+    function renderNPCList() {
+      return wizardData.npcList.map((npc, idx) => `
+        <div style="background: #2a2a2a; padding: 12px; border-radius: 4px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="color: #d97706;">NPC ${idx + 1}</strong>
+            ${wizardData.npcList.length > 1 ? `<button class="removeNPC" data-idx="${idx}" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">Remove</button>` : ''}
+          </div>
+          <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 10px;">
+            <input type="text" class="npcName" data-idx="${idx}" value="${npc.name || ''}"
+                   placeholder="Name"
+                   style="padding: 6px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 3px;">
+            <input type="text" class="npcRole" data-idx="${idx}" value="${npc.role || ''}"
+                   placeholder="Role (e.g., Warrior, Merchant)"
+                   style="padding: 6px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 3px;">
+            <select class="npcGender" data-idx="${idx}"
+                    style="padding: 6px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 3px;">
+              <option value="">Gender...</option>
+              <option value="Male" ${npc.gender === 'Male' ? 'selected' : ''}>Male</option>
+              <option value="Female" ${npc.gender === 'Female' ? 'selected' : ''}>Female</option>
+              <option value="Other" ${npc.gender === 'Other' ? 'selected' : ''}>Other</option>
+            </select>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    el.inputArea.innerHTML = `
+      <div id="npcListContainer" style="margin-bottom: 15px;">
+        ${renderNPCList()}
+      </div>
+
+      <button id="addNPCBtn" style="width: 100%; padding: 8px; background: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-bottom: 15px;">
+        + Add Another NPC
+      </button>
+
+      <div style="background: #2a2a2a; padding: 12px; border-radius: 4px; border-left: 3px solid #8b5cf6; margin-bottom: 15px;">
+        <p style="color: #e0e0e0; margin: 0; font-size: 13px;">
+          <strong>⚠️ Romance & Mature Content Notice:</strong> The AI will create DETAILED physical descriptions for romance support. Each NPC will have vivid appearance details including body type, curves, distinctive features, and romantic appeal.
+        </p>
+      </div>
+
+      <button id="generateBtn" style="width: 100%; padding: 12px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px;">
+        🤖 Generate Full NPC Profiles
+      </button>
+    `;
+
+    function attachHandlers() {
+      // Update handlers
+      el.inputArea.querySelectorAll('.npcName').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const idx = parseInt(e.target.getAttribute('data-idx'));
+          wizardData.npcList[idx].name = e.target.value;
+        });
+      });
+
+      el.inputArea.querySelectorAll('.npcRole').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const idx = parseInt(e.target.getAttribute('data-idx'));
+          wizardData.npcList[idx].role = e.target.value;
+        });
+      });
+
+      el.inputArea.querySelectorAll('.npcGender').forEach(select => {
+        select.addEventListener('change', (e) => {
+          const idx = parseInt(e.target.getAttribute('data-idx'));
+          wizardData.npcList[idx].gender = e.target.value;
+        });
+      });
+
+      // Remove handlers
+      el.inputArea.querySelectorAll('.removeNPC').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.getAttribute('data-idx'));
+          wizardData.npcList.splice(idx, 1);
+          el.inputArea.querySelector('#npcListContainer').innerHTML = renderNPCList();
+          attachHandlers();
+        });
+      });
+    }
+
+    attachHandlers();
+
+    // Add NPC button
+    document.getElementById('addNPCBtn').addEventListener('click', () => {
+      wizardData.npcList.push({ name: '', role: '', gender: '' });
+      el.inputArea.querySelector('#npcListContainer').innerHTML = renderNPCList();
+      attachHandlers();
+    });
+
+    // Generate button
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const validNPCs = wizardData.npcList.filter(npc => npc.name && npc.role && npc.gender);
+
+      if (validNPCs.length === 0) {
+        alert('Please fill out at least one NPC with Name, Role, and Gender.');
+        return;
+      }
+
+      wizardData.npcList = validNPCs;
+      wizardData.npcCount = validNPCs.length;
+
+      render();
+    });
+  }
+
+  function renderStep3Form() {
       // Show input form for basic character data
       el.convoBody.innerHTML = `
         <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
@@ -1079,9 +1335,8 @@ Remember: This is a mature game with romance. Physical descriptions should be vi
             <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Gender *</label>
             <select id="charGender" style="width: 100%; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px;">
               <option value="">Select...</option>
-              <option value="Male" ${wizardData.characterGender === 'Male' ? 'selected' : ''}>Male (He/Him)</option>
-              <option value="Female" ${wizardData.characterGender === 'Female' ? 'selected' : ''}>Female (She/Her)</option>
-              <option value="Non-binary" ${wizardData.characterGender === 'Non-binary' ? 'selected' : ''}>Non-binary (They/Them)</option>
+              <option value="Male" ${wizardData.characterGender === 'Male' ? 'selected' : ''}>Male</option>
+              <option value="Female" ${wizardData.characterGender === 'Female' ? 'selected' : ''}>Female</option>
               <option value="Other" ${wizardData.characterGender === 'Other' ? 'selected' : ''}>Other</option>
             </select>
           </div>
@@ -1214,40 +1469,142 @@ Remember: This is a mature game with romance. Physical descriptions should be vi
       });
 
       updatePointDisplay();
+  }
 
-    } else {
-      // Show chat UI with context
-      const chatHistory = wizardData.chatHistory[stepKey];
+  function renderHybridChat(config, stepKey) {
+    // Show chat UI with context
+    const chatHistory = wizardData.chatHistory[stepKey];
 
       // Render chat container
       const chatContainer = document.createElement('div');
       chatContainer.style.cssText = 'max-height: 400px; overflow-y: auto; margin-bottom: 15px; padding: 10px; background: #1a1a1a; border-radius: 4px;';
 
       if (chatHistory.length === 0) {
-        // Initial message with character summary
-        const stats = wizardData.pointBuyStats;
-        const statSummary = `STR ${stats.STR}, DEX ${stats.DEX}, CON ${stats.CON}, INT ${stats.INT}, WIS ${stats.WIS}, CHA ${stats.CHA}`;
+        // Initial message - different per step
+        let initialMessage = '';
+
+        if (currentStep === 0) {
+          // Step 0: World Context
+          initialMessage = `Perfect! I see you've started with:
+
+<strong>World Name:</strong> ${wizardData.worldName}
+<strong>Genre:</strong> ${wizardData.worldGenre}
+<strong>Main Conflict:</strong> ${wizardData.worldConflict}
+
+Now let's build the complete world context! I'll help you define:
+- Full premise and conflict origin
+- Main objectives (win/lose conditions)
+- Key locations (3-5 important places)
+- Tone and DM narrative style
+- Opposing forces and factions
+
+Let's start - tell me more about the conflict. How did it begin? What's at stake?`;
+        } else if (currentStep === 1) {
+          // Step 1: Rules & Mechanics
+          const approach = wizardData.mechanicsApproach;
+
+          if (approach === 'defaults') {
+            initialMessage = `Great! You've chosen <strong>Balanced Defaults</strong>.
+
+I'll help you understand and customize the default mechanics:
+
+<strong>📊 Combat System</strong>
+- d20 + stat modifier vs DC (10=Easy, 13=Normal, 16=Hard)
+- Turn-based (individual for 1-3 turns, then summarized every 3 rounds)
+- Boss fights: 6-12 turns with narrative compression
+
+<strong>📈 Progression</strong>
+- Levels 1-20 (balanced XP curve, ~15k total to max)
+- +1 stat per level, max modifier +10 (stat cap 30)
+- Sources: Base (8-15), Racial (-2 to +4), Levels (+19), Equipment (+8), Companions (+5)
+
+<strong>💰 Economy & Inventory</strong>
+- Single currency (you name it)
+- Key items only (quest items, special equipment, relics)
+
+<strong>👥 Companions</strong>
+- Max 2 companions, share player level
+- Each provides stat bonuses matching their story
+
+<strong>❤️ Relationship System</strong>
+- 0-150+ points per NPC
+- 50=Friend, 100=Romance, 150=Mature content
+- Gains: Dialogue +2-5, Choices +3-10, Quests +10-30
+
+Would you like to customize any of these, or should I write them all to the Living File as-is?`;
+          } else {
+            initialMessage = `Perfect! You've chosen <strong>Custom Mechanics</strong>.
+
+Let's build your game systems from the ground up! I'll help you define:
+
+<strong>📊 Combat System</strong> - How do battles work? (dice, turn structure, enemy AI)
+<strong>📈 Progression</strong> - How do players level up? (XP curve, stat gains, level cap)
+<strong>💰 Economy & Inventory</strong> - What can players collect and buy?
+<strong>👥 Companions</strong> - How do party members work?
+<strong>❤️ Relationship System</strong> - How do NPC relationships develop?
+
+Where would you like to start? Or tell me your vision and I'll organize it!`;
+          }
+        } else if (currentStep === 2) {
+          // Step 2: NPCs & Factions
+          const npcListSummary = wizardData.npcList.map((npc, idx) =>
+            `${idx + 1}. ${npc.name} (${npc.gender} ${npc.role})`
+          ).join('\n');
+
+          initialMessage = `Great! You've created ${wizardData.npcCount} key NPC${wizardData.npcCount > 1 ? 's' : ''}:
+
+${npcListSummary}
+
+Now I'll help you build complete profiles for each! For every NPC, I'll create:
+
+<strong>📖 Story & Background</strong>
+- Name, race, origin, beliefs/values, behavior
+- Role in the world, faction alignment
+- Starting relationship points (allies +20-50, neutral 0, rivals/enemies negative)
+
+<strong>💪 Companion Stats (if applicable)</strong>
+- Special abilities if they join the party
+- Stat bonuses they provide (matching their story)
+
+<strong>💜 Physical Appearance (DETAILED for Romance)</strong>
+- Height, build, hair, eyes, face
+- Body type, curves, distinctive features
+- Romantic/attractive characteristics
+- Clothing and style
+
+<strong>❤️ Romance Availability</strong>
+- Can they be romanced? (Yes/No)
+- If yes: Romantic preferences, personality in relationships
+
+Let's start! Tell me more about the first NPC (${wizardData.npcList[0].name}), or I can expand them all based on your world context. What would you like?`;
+        } else if (currentStep === 3) {
+          // Step 3: Character Creation
+          const stats = wizardData.pointBuyStats;
+          const statSummary = `STR ${stats.STR}, DEX ${stats.DEX}, CON ${stats.CON}, INT ${stats.INT}, WIS ${stats.WIS}, CHA ${stats.CHA}`;
+
+          initialMessage = `Perfect! I see you've created:
+
+<strong>${wizardData.characterName}</strong> (${wizardData.characterGender})
+${wizardData.characterRace} ${wizardData.characterClass}
+Goal: ${wizardData.characterGoal}
+Base Stats: ${statSummary}
+
+Now let's build the rest! I'll help you create:
+- Backstory and origin
+- Racial stat bonuses (narrative-based)
+- Detailed physical appearance (important for romance!)
+- Personality traits
+- Starting abilities
+- Starting equipment
+
+Let's start with your backstory. Tell me about ${wizardData.characterName}'s history - how did they become a ${wizardData.characterClass}? What drives them?`;
+        }
 
         chatContainer.innerHTML = `
           <div style="margin-bottom: 15px;">
             <div style="color: #888; font-size: 12px; margin-bottom: 5px;">🤖 World Building Assistant</div>
             <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; color: #e0e0e0; line-height: 1.6;">
-              Perfect! I see you've created:
-
-              <strong>${wizardData.characterName}</strong> (${wizardData.characterGender})
-              ${wizardData.characterRace} ${wizardData.characterClass}
-              Goal: ${wizardData.characterGoal}
-              Base Stats: ${statSummary}
-
-              Now let's build the rest! I'll help you create:
-              - Backstory and origin
-              - Racial stat bonuses (narrative-based)
-              - Detailed physical appearance (important for romance!)
-              - Personality traits
-              - Starting abilities
-              - Starting equipment
-
-              Let's start with your backstory. Tell me about ${wizardData.characterName}'s history - how did they become a ${wizardData.characterClass}? What drives them?
+              ${initialMessage}
             </div>
           </div>
         `;
@@ -1316,10 +1673,54 @@ Remember: This is a mature game with romance. Physical descriptions should be vi
         }
 
         try {
-          // Build context with character data
-          const stats = wizardData.pointBuyStats;
-          const statString = `STR ${stats.STR}, DEX ${stats.DEX}, CON ${stats.CON}, INT ${stats.INT}, WIS ${stats.WIS}, CHA ${stats.CHA}`;
-          const characterContext = `
+          // Build context based on step
+          let contextMessage = userMessage;
+
+          if (currentStep === 0) {
+            // Step 0: World Context
+            const worldContext = `
+WORLD INPUT:
+World Name: ${wizardData.worldName}
+Genre/Theme: ${wizardData.worldGenre}
+Main Conflict: ${wizardData.worldConflict}`;
+            contextMessage = worldContext + '\n\n' + userMessage;
+          } else if (currentStep === 1) {
+            // Step 1: Rules & Mechanics
+            const mechanicsContext = `
+MECHANICS APPROACH: ${wizardData.mechanicsApproach === 'defaults' ? 'Balanced Defaults' : 'Custom Mechanics'}
+
+${wizardData.mechanicsApproach === 'defaults' ?
+  `Using default mechanics (d20 combat, levels 1-20, relationship 0-150+, max 2 companions).
+The user may want to customize specific aspects or accept defaults as-is.` :
+  `Building custom mechanics from scratch. Help the user define combat, progression, inventory, companions, and relationships.`
+}
+
+Reference the world context from Step 0 if available.`;
+            contextMessage = mechanicsContext + '\n\n' + userMessage;
+          } else if (currentStep === 2) {
+            // Step 2: NPCs & Factions
+            const npcListContext = wizardData.npcList.map((npc, idx) =>
+              `${idx + 1}. ${npc.name} - ${npc.gender} ${npc.role}`
+            ).join('\n');
+
+            const npcContext = `
+NPC INPUT (${wizardData.npcCount} NPCs):
+${npcListContext}
+
+IMPORTANT REQUIREMENTS:
+- Create DETAILED physical descriptions for romance support
+- Include: height, build, body type, curves, distinctive features, romantic appeal
+- Specify starting relationship points (allies +20-50, neutral 0, enemies negative)
+- Mark if romanceable (yes/no)
+- Add companion stats/bonuses if applicable
+
+Reference the world context and mechanics from previous steps.`;
+            contextMessage = npcContext + '\n\n' + userMessage;
+          } else if (currentStep === 3) {
+            // Step 3: Character Creation
+            const stats = wizardData.pointBuyStats;
+            const statString = `STR ${stats.STR}, DEX ${stats.DEX}, CON ${stats.CON}, INT ${stats.INT}, WIS ${stats.WIS}, CHA ${stats.CHA}`;
+            const characterContext = `
 PLAYER CHARACTER INPUT:
 Name: ${wizardData.characterName}
 Gender: ${wizardData.characterGender}
@@ -1329,8 +1730,10 @@ Personal Goal: ${wizardData.characterGoal}
 Base Stats (Point-Buy): ${statString}
 
 Reference the world context from previous steps as needed.`;
+            contextMessage = characterContext + '\n\n' + userMessage;
+          }
 
-          const response = await callWorldBuildingAssistant(stepKey, characterContext + '\n\n' + userMessage);
+          const response = await callWorldBuildingAssistant(stepKey, contextMessage);
 
           wizardData.chatHistory[stepKey].push({ role: 'assistant', content: response.message });
 
