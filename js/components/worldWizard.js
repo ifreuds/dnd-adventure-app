@@ -35,6 +35,7 @@ export function renderWorldWizard(container, existingWorldData = null) {
     worldName: '',
     worldGenre: '',
     worldConflict: '',
+    narrativeStyle: '',
 
     // Step 1: Rules & Mechanics
     mechanicsApproach: '', // 'defaults' or 'custom'
@@ -76,29 +77,31 @@ export function renderWorldWizard(container, existingWorldData = null) {
   // DOM structure
   container.innerHTML = `
     <div class="wizard">
-      <div class="wizard-sidebar">
-        <h2 style="margin-top:0; color:#e0e0e0;">World Creation</h2>
-        <ul class="wizard-steps" id="stepsList"></ul>
-        <button id="guidelineBtn" style="margin-top: 20px; width: 100%; padding: 8px; background: #333; border: 1px solid #555;">
-          ⚙️ Edit Guidelines
-        </button>
-      </div>
-      <div class="wizard-main">
-        <div class="panel" id="convoPanel">
-          <h3 id="convoTitle" style="margin-top:0; color:#d97706;"></h3>
-          <div id="convoBody" style="flex:1; overflow-y:auto;"></div>
-          <div id="inputArea" style="margin-top:15px;"></div>
+      <div class="wizard-content">
+        <div class="wizard-sidebar">
+          <h2 style="margin-top:0; color:#e0e0e0;">World Creation</h2>
+          <ul class="wizard-steps" id="stepsList"></ul>
+          <button id="guidelineBtn" style="margin-top: 20px; width: 100%; padding: 8px; background: #333; border: 1px solid #555;">
+            ⚙️ Edit Guidelines
+          </button>
         </div>
-        <div class="panel" id="filePanel">
-          <h3 style="margin-top:0; color:#059669;">Living File</h3>
-          <div id="fileBody" style="flex:1; overflow-y:auto; background:#1a1a1a; padding:15px; border-radius:4px; color:#e0e0e0;"></div>
+        <div class="wizard-main">
+          <div class="panel" id="convoPanel">
+            <h3 id="convoTitle" style="margin-top:0; color:#d97706; flex-shrink: 0;"></h3>
+            <div id="convoBody" style="flex:1; overflow-y:auto;"></div>
+            <div id="inputArea" style="margin-top:15px; flex-shrink: 0;"></div>
+          </div>
+          <div class="panel" id="filePanel">
+            <h3 style="margin-top:0; color:#059669; flex-shrink: 0;">Living File</h3>
+            <div id="fileBody" style="flex:1; overflow-y:auto; background:#1a1a1a; padding:15px; border-radius:4px; color:#e0e0e0;"></div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="button-bar">
-      <button id="backBtn">← Back</button>
-      <button id="nextBtn">Next →</button>
-      <button id="finishBtn" style="display:none; background:#059669;">Finish & Start Adventure</button>
+      <div class="button-bar">
+        <button id="backBtn">← Back</button>
+        <button id="nextBtn">Next →</button>
+        <button id="finishBtn" style="display:none; background:#059669;">Finish & Start Adventure</button>
+      </div>
     </div>
   `;
 

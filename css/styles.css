@@ -28,10 +28,11 @@ button:hover {
 }
 
 /* --- Wizard layout --- */
-.wizard { display: flex; height: 100vh; }
+.wizard { display: flex; height: 100vh; flex-direction: column; }
+.wizard-content { display: flex; flex: 1; overflow: hidden; }
 .wizard-sidebar { width: 250px; background:#1e1e1e; padding:12px; border-right:1px solid #333; }
-.wizard-main { flex:1; display:flex; flex-direction:row; }
-.panel { flex:1; padding:20px; }
+.wizard-main { flex:1; display:flex; flex-direction:row; overflow: hidden; }
+.panel { flex:1; padding:20px; display: flex; flex-direction: column; overflow: hidden; }
 .panel + .panel { border-left:1px solid #333; }
 
 .wizard-steps { list-style:none; padding-left:0; margin:8px 0 0; }

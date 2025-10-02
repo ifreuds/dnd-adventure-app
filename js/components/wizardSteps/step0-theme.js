@@ -28,6 +28,18 @@ export function renderStep0Form(wizardData, el, onComplete) {
         <textarea id="worldConflict" placeholder="What's the central problem or threat? (1-2 sentences)"
                   style="width: 100%; min-height: 60px; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px; resize: vertical;">${wizardData.worldConflict || ''}</textarea>
       </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Narrative Style (DM Tone) *</label>
+        <select id="narrativeStyle" style="width: 100%; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px;">
+          <option value="">Select...</option>
+          <option value="Descriptive & Atmospheric" ${wizardData.narrativeStyle === 'Descriptive & Atmospheric' ? 'selected' : ''}>Descriptive & Atmospheric (detailed environments, vivid imagery)</option>
+          <option value="Action-Focused" ${wizardData.narrativeStyle === 'Action-Focused' ? 'selected' : ''}>Action-Focused (fast-paced, emphasis on what happens)</option>
+          <option value="Dramatic & Theatrical" ${wizardData.narrativeStyle === 'Dramatic & Theatrical' ? 'selected' : ''}>Dramatic & Theatrical (emotional, intense moments)</option>
+          <option value="Casual & Conversational" ${wizardData.narrativeStyle === 'Casual & Conversational' ? 'selected' : ''}>Casual & Conversational (relaxed, friendly tone)</option>
+          <option value="Grim & Brutal" ${wizardData.narrativeStyle === 'Grim & Brutal' ? 'selected' : ''}>Grim & Brutal (dark, unforgiving, visceral)</option>
+          <option value="Mysterious & Enigmatic" ${wizardData.narrativeStyle === 'Mysterious & Enigmatic' ? 'selected' : ''}>Mysterious & Enigmatic (cryptic, haunting atmosphere)</option>
+        </select>
+      </div>
     </div>
 
     <button id="generateBtn" style="width: 100%; padding: 12px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px;">
@@ -39,8 +51,9 @@ export function renderStep0Form(wizardData, el, onComplete) {
     const worldName = document.getElementById('worldName').value.trim();
     const worldGenre = document.getElementById('worldGenre').value.trim();
     const worldConflict = document.getElementById('worldConflict').value.trim();
+    const narrativeStyle = document.getElementById('narrativeStyle').value;
 
-    if (!worldName || !worldGenre || !worldConflict) {
+    if (!worldName || !worldGenre || !worldConflict || !narrativeStyle) {
       alert('Please fill out all fields before generating.');
       return;
     }
@@ -48,6 +61,7 @@ export function renderStep0Form(wizardData, el, onComplete) {
     wizardData.worldName = worldName;
     wizardData.worldGenre = worldGenre;
     wizardData.worldConflict = worldConflict;
+    wizardData.narrativeStyle = narrativeStyle;
 
     onComplete();
   });
@@ -59,13 +73,15 @@ export function getStep0InitialMessage(wizardData) {
 <strong>World Name:</strong> ${wizardData.worldName}
 <strong>Genre:</strong> ${wizardData.worldGenre}
 <strong>Main Conflict:</strong> ${wizardData.worldConflict}
+<strong>Narrative Style:</strong> ${wizardData.narrativeStyle}
 
 Now let's build the complete world context! I'll help you define:
 - Full premise and conflict origin
 - Main objectives (win/lose conditions)
 - Key locations (3-5 important places)
-- Tone and DM narrative style
 - Opposing forces and factions
+
+I'll narrate in a <strong>${wizardData.narrativeStyle}</strong> style throughout your adventure.
 
 Let's start - tell me more about the conflict. How did it begin? What's at stake?`;
 }
@@ -75,11 +91,12 @@ export function buildStep0Context(wizardData, userMessage) {
 WORLD INPUT:
 World Name: ${wizardData.worldName}
 Genre/Theme: ${wizardData.worldGenre}
-Main Conflict: ${wizardData.worldConflict}`;
+Main Conflict: ${wizardData.worldConflict}
+Narrative Style: ${wizardData.narrativeStyle}`;
 
   return worldContext + '\n\n' + userMessage;
 }
 
 export function isStep0Complete(wizardData) {
-  return wizardData.worldName && wizardData.worldGenre && wizardData.worldConflict;
+  return wizardData.worldName && wizardData.worldGenre && wizardData.worldConflict && wizardData.narrativeStyle;
 }
