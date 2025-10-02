@@ -4,7 +4,9 @@
       "Bash(node:*)",
       "WebSearch",
       "WebFetch(domain:platform.openai.com)",
-      "WebFetch(domain:docs.x.ai)"
+      "WebFetch(domain:docs.x.ai)",
+      "Bash(awk:*)",
+      "Read(//c//**)"
     ],
     "deny": [],
     "ask": []

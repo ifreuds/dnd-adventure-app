@@ -1762,7 +1762,6 @@ Reference the world context from previous steps as needed.`;
           handleSend();
         }
       });
-    }
   }
 
   async function callWorldBuildingAssistant(stepKey, userMessage) {
