@@ -126,8 +126,13 @@ All modals use overlay pattern (no full page replacement):
 - **Load World Modal** - List of saved worlds with metadata (character, turns, timestamp), load button per world
 
 ### Animations
-- **Dice Roll**: Numbers cycle 1-20 at 80ms intervals (15 cycles), final result scales up 1.5x then back to 1x, color-coded by result (green 15+, orange 10-14, red <10)
+- **Dice Roll**:
+  - When required: Button pulses with orange glow, info panel shows check type + DC
+  - During roll: Numbers cycle 1-20 at 80ms intervals (15 cycles)
+  - Result: Final number scales up 1.5x then back to 1x, color-coded by result (green 15+, orange 10-14, red <10)
+- **DM Thinking**: Animated dots with spinning circle during API calls
 - **Modal Fade-in**: 0.2s opacity fade + 0.3s slide-down from -50px
+- **Dice Button Pulse**: Glowing orange animation (1.5s loop) when roll is required
 
 ### Navigation Flow
 - Entry → New World → Wizard (4 steps) → Game UI
@@ -156,8 +161,11 @@ All modals use overlay pattern (no full page replacement):
    - **Normal Mode** → `generateGptNarration(context)` from gpt.js (GPT-5-mini)
    - **Mature Mode** → `generateGrokNarration(context)` from grok.js (Grok-4-Fast)
 4. AI returns JSON with narration, choices, dice requirements
-5. Update UI with narration (shows DM badge: "🎲 GPT DM" or "🔞 Grok DM")
-6. Add turn to scene log (max 10 turns)
+5. Update UI with narration (clean text, no badges in chat log)
+6. If dice required: Show compact info panel with check type + DC, light up dice button with pulse animation
+7. Add turn to scene log (max 10 turns)
+
+**Note**: When `diceRequired: true`, choice buttons are hidden until dice is rolled. This is expected behavior - AI provides choices but they're not shown until roll outcome is determined.
 
 ### Scene Log Format
 ```javascript
