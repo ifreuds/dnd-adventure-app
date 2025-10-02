@@ -1,4 +1,5 @@
-import { generateNarration } from "../services/gpt.js";
+import { generateNarration as generateGptNarration } from "../services/gpt.js";
+import { generateNarration as generateGrokNarration } from "../services/grok.js";
 
 export function renderGameUI(container, worldData = {}) {
   container.innerHTML = `
@@ -114,7 +115,7 @@ export function renderGameUI(container, worldData = {}) {
   };
 
   // Game state
-  let currentMode = "Normal";
+  let isMatureMode = false; // Track mature/romance mode toggle
   let diceActive = false;
   let savedImages = []; // Store generated images for gallery
   let sceneLog = []; // Track recent turns for GPT context
@@ -175,7 +176,7 @@ export function renderGameUI(container, worldData = {}) {
     el.submitActionBtn.disabled = true;
 
     try {
-      // Call GPT API
+      // Build context for API
       const context = {
         worldTheme: worldData.theme || worldData.toneTags || "Fantasy adventure",
         character: {
@@ -189,7 +190,10 @@ export function renderGameUI(container, worldData = {}) {
         playerAction: action
       };
 
-      const result = await generateNarration(context);
+      // Route to appropriate API based on mode
+      const result = isMatureMode
+        ? await generateGrokNarration(context)
+        : await generateGptNarration(context);
 
       // Add to scene log
       sceneLog.push({
@@ -315,7 +319,10 @@ export function renderGameUI(container, worldData = {}) {
               playerAction: `[Dice Roll: ${finalRoll} vs DC ${dc}] ${success ? "SUCCESS" : "FAILURE"} on ${pendingDiceRoll?.context || "check"}`
             };
 
-            const result = await generateNarration(context);
+            // Route to appropriate API based on mode
+            const result = isMatureMode
+              ? await generateGrokNarration(context)
+              : await generateGptNarration(context);
 
             addNarration(result.narration);
             renderChoices(result.choices);
@@ -349,7 +356,30 @@ export function renderGameUI(container, worldData = {}) {
   });
 
   el.modeToggleBtn.addEventListener("click", () => {
-    alert("Romance mode is not yet implemented. This feature will be added in a future update.");
+    // Toggle mature mode
+    isMatureMode = !isMatureMode;
+
+    // Update button text and style
+    if (isMatureMode) {
+      el.modeToggleBtn.textContent = "Mode: Mature 🔞";
+      el.modeToggleBtn.style.background = "#8B0000";
+      el.modeToggleBtn.style.color = "#fff";
+
+      // Check if Grok API key exists
+      const grokApiKey = localStorage.getItem("grok_api_key");
+      if (!grokApiKey) {
+        alert("⚠️ Mature Mode requires a Grok API key.\n\nPlease add your xAI API key in Settings to use this feature.");
+        // Revert toggle
+        isMatureMode = false;
+        el.modeToggleBtn.textContent = "Mode: Normal";
+        el.modeToggleBtn.style.background = "";
+        el.modeToggleBtn.style.color = "";
+      }
+    } else {
+      el.modeToggleBtn.textContent = "Mode: Normal";
+      el.modeToggleBtn.style.background = "";
+      el.modeToggleBtn.style.color = "";
+    }
   });
 
   el.settingsBtn.addEventListener("click", () => {
@@ -536,8 +566,9 @@ export function renderGameUI(container, worldData = {}) {
     const modal = document.createElement("div");
     modal.className = "modal-overlay";
 
-    // Get current API key from localStorage
-    const currentApiKey = localStorage.getItem("openai_api_key") || "";
+    // Get current API keys from localStorage
+    const currentGptApiKey = localStorage.getItem("openai_api_key") || "";
+    const currentGrokApiKey = localStorage.getItem("grok_api_key") || "";
 
     modal.innerHTML = `
       <div class="modal-content">
@@ -546,20 +577,38 @@ export function renderGameUI(container, worldData = {}) {
           <button class="modal-close-btn">&times;</button>
         </div>
         <div class="modal-body">
-          <h3 style="margin-top: 0;">OpenAI API Key</h3>
+          <h3 style="margin-top: 0;">OpenAI API Key (Normal Mode)</h3>
           <p class="muted" style="font-size: 0.9em; margin-bottom: 12px;">
             Enter your OpenAI API key to enable GPT-powered narration. Your key is stored locally in your browser.
           </p>
           <input
             type="password"
-            id="apiKeyInput"
-            value="${currentApiKey}"
+            id="gptApiKeyInput"
+            value="${currentGptApiKey}"
             placeholder="sk-proj-..."
             style="width: 100%; padding: 10px; background: #1a1a1a; color: #e0e0e0; border: 1px solid #333; border-radius: 4px; font-family: monospace; margin-bottom: 8px;"
           />
           <p class="muted" style="font-size: 0.85em;">
             Don't have an API key? <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #4CAF50;">Get one here</a>
           </p>
+
+          <hr style="border-color: #333; margin: 20px 0;">
+
+          <h3>xAI Grok API Key (Mature Mode)</h3>
+          <p class="muted" style="font-size: 0.9em; margin-bottom: 12px;">
+            Enter your xAI API key to enable Grok-powered mature/romance mode narration. Your key is stored locally in your browser.
+          </p>
+          <input
+            type="password"
+            id="grokApiKeyInput"
+            value="${currentGrokApiKey}"
+            placeholder="xai-..."
+            style="width: 100%; padding: 10px; background: #1a1a1a; color: #e0e0e0; border: 1px solid #333; border-radius: 4px; font-family: monospace; margin-bottom: 8px;"
+          />
+          <p class="muted" style="font-size: 0.85em;">
+            Don't have an API key? <a href="https://x.ai/api" target="_blank" style="color: #4CAF50;">Get one here</a>
+          </p>
+
           <div id="apiKeyStatus" style="margin-top: 12px; padding: 10px; border-radius: 4px; display: none;"></div>
 
           <hr style="border-color: #333; margin: 20px 0;">
@@ -580,7 +629,8 @@ export function renderGameUI(container, worldData = {}) {
     const saveBtn = modal.querySelector("#saveSettingsBtn");
     const cancelBtn = modal.querySelector("#cancelSettingsBtn");
     const editWorldBtn = modal.querySelector("#editWorldBtn");
-    const apiKeyInput = modal.querySelector("#apiKeyInput");
+    const gptApiKeyInput = modal.querySelector("#gptApiKeyInput");
+    const grokApiKeyInput = modal.querySelector("#grokApiKeyInput");
     const apiKeyStatus = modal.querySelector("#apiKeyStatus");
 
     // Close modal
@@ -599,41 +649,54 @@ export function renderGameUI(container, worldData = {}) {
 
     // Save settings
     saveBtn.addEventListener("click", () => {
-      const apiKey = apiKeyInput.value.trim();
+      const gptApiKey = gptApiKeyInput.value.trim();
+      const grokApiKey = grokApiKeyInput.value.trim();
 
-      if (apiKey) {
-        // Validate API key format (basic check)
-        if (!apiKey.startsWith("sk-")) {
-          apiKeyStatus.style.display = "block";
-          apiKeyStatus.style.background = "#8B0000";
-          apiKeyStatus.style.color = "#fff";
-          apiKeyStatus.textContent = "⚠️ Invalid API key format. OpenAI keys start with 'sk-'";
-          return;
-        }
+      let hasError = false;
 
-        // Save to localStorage
-        localStorage.setItem("openai_api_key", apiKey);
-
+      // Validate GPT API key format if provided
+      if (gptApiKey && !gptApiKey.startsWith("sk-")) {
         apiKeyStatus.style.display = "block";
-        apiKeyStatus.style.background = "#1a4d1a";
-        apiKeyStatus.style.color = "#4CAF50";
-        apiKeyStatus.textContent = "✓ API key saved successfully!";
-
-        setTimeout(() => {
-          closeModal();
-        }, 1500);
-      } else {
-        // Clear API key
-        localStorage.removeItem("openai_api_key");
-        apiKeyStatus.style.display = "block";
-        apiKeyStatus.style.background = "#1a4d1a";
-        apiKeyStatus.style.color = "#4CAF50";
-        apiKeyStatus.textContent = "✓ API key cleared";
-
-        setTimeout(() => {
-          closeModal();
-        }, 1500);
+        apiKeyStatus.style.background = "#8B0000";
+        apiKeyStatus.style.color = "#fff";
+        apiKeyStatus.textContent = "⚠️ Invalid OpenAI API key format. Keys should start with 'sk-'";
+        hasError = true;
       }
+
+      // Validate Grok API key format if provided (xAI keys typically start with 'xai-')
+      if (grokApiKey && !grokApiKey.startsWith("xai-")) {
+        apiKeyStatus.style.display = "block";
+        apiKeyStatus.style.background = "#8B0000";
+        apiKeyStatus.style.color = "#fff";
+        apiKeyStatus.textContent = "⚠️ Invalid xAI API key format. Keys should start with 'xai-'";
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      // Save or remove GPT API key
+      if (gptApiKey) {
+        localStorage.setItem("openai_api_key", gptApiKey);
+      } else {
+        localStorage.removeItem("openai_api_key");
+      }
+
+      // Save or remove Grok API key
+      if (grokApiKey) {
+        localStorage.setItem("grok_api_key", grokApiKey);
+      } else {
+        localStorage.removeItem("grok_api_key");
+      }
+
+      // Show success message
+      apiKeyStatus.style.display = "block";
+      apiKeyStatus.style.background = "#1a4d1a";
+      apiKeyStatus.style.color = "#4CAF50";
+      apiKeyStatus.textContent = "✓ Settings saved successfully!";
+
+      setTimeout(() => {
+        closeModal();
+      }, 1500);
     });
 
     // Edit world button
