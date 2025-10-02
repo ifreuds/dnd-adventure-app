@@ -95,8 +95,9 @@ The wizard uses a **two-panel collaborative design**:
     - ❌ Do NOT use `response_format: { type: "json_object" }` - causes empty responses with all tokens used for reasoning
     - ❌ Do NOT use `temperature` parameter - only default (1) is supported
     - ✅ Use `max_completion_tokens` (not `max_tokens`)
-    - ✅ Set high token limit (2000+) to account for reasoning tokens
+    - ✅ Set high token limit (3500) to account for reasoning tokens (~2000) + actual response (~1500)
     - ✅ Parse JSON from response (handles both raw JSON and markdown code blocks)
+    - ⚠️ **Known issue**: Complex prompts may consume all tokens in reasoning, leaving empty response. Solution: simplify prompts and increase token limit.
 
 ### ✅ Backend Integration - Mature Mode (Grok API)
 - **Grok API integration** - ✅ Working!
@@ -181,5 +182,13 @@ All modals use overlay pattern (no full page replacement):
   - `🎲 Calling Grok-4-Fast (Mature Mode) API...` or `🎲 Calling GPT-5-mini (Normal Mode) API...`
   - `✅ Grok response received:` or `✅ GPT response received:` with full response object
 - Look for `completion_tokens_details.reasoning_tokens` (GPT-5-mini) - if this equals total tokens, response will be empty
+  - **Fix**: Increased `max_completion_tokens` to 3500 to account for reasoning overhead
+  - **Fix**: Simplified dice roll context to avoid long prompts
 - If JSON parsing fails, check if AI wrapped response in markdown code blocks
 - Verify which DM is active by checking the loading indicator: "🎲 GPT DM is thinking" vs "🎲 Grok DM is thinking"
+
+### Dice Roll Improvements (Latest)
+- **Spoiler prevention**: Success/failure outcomes hidden from player before roll
+- **Loading feedback**: "DM is thinking" indicator shows after dice animation completes
+- **Simplified context**: Only check type sent to API, not full success/failure descriptions
+- **Token optimization**: Context stripped to prevent GPT-5-mini reasoning token overflow

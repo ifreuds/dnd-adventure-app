@@ -176,7 +176,8 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
     - Cannot use `response_format: { type: "json_object" }` - causes empty responses
     - Cannot customize `temperature` - only default (1) supported
     - Uses `max_completion_tokens` instead of `max_tokens`
-    - Reasoning tokens can consume all tokens if not careful
+    - Reasoning tokens (~2000) can consume all tokens if not careful
+    - **Current limit**: 3500 tokens (2000 reasoning + 1500 response)
 
 - **Grok API integration (Mature Mode)** - ✅ Working!
   - Model: `grok-4-fast-reasoning`
@@ -193,8 +194,11 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
 ### ⚙️ Partially Implemented
 - **Dice Roll UI** - ✅ Enhanced with visual feedback
   - Compact info panel shows check type + DC when roll required
+  - **Spoiler prevention**: Success/failure outcomes hidden before roll
   - Button pulses with orange glow animation
+  - **Loading feedback**: "DM is thinking" shows after dice animation
   - Choices hidden until dice rolled (expected behavior)
+  - **Token optimization**: Simplified context to prevent GPT-5-mini overflow
 
 ### ❌ Not Yet Implemented
 - **Supabase database connection** - Placeholder save/load (js/services/supabase.js exists but empty)
@@ -219,9 +223,15 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
 - ✅ Grok-4-Fast integration working (Mature Mode)
 - ✅ Mode switching seamless with visual indicators
 - ✅ Dice UI enhanced with pulsing button and compact info panel
+- ✅ Dice roll fixes:
+  - Spoilers hidden (success/failure outcomes not shown before roll)
+  - Loading indicator shows after dice animation
+  - Context simplified to prevent GPT-5-mini token overflow
+  - Token limit increased to 3500
 - 📋 **Next Priority**: World Creation Wizard improvements
   - Current: Manual input fields
   - Goal: AI-assisted conversation mode
   - Once world tone/style established, gameplay will be more cohesive
+  - **Important**: World setting context will be added to all API calls, may need further token optimization
 - ⚠️ Known behavior: Choices hidden when dice roll required (by design)
 - 💡 Both AIs return choices properly, but prompts may need refinement for better quality  
