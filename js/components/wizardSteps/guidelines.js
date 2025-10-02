@@ -175,7 +175,11 @@ Opposing Forces: [Who/what opposes the player? List major groups/entities]
 Power Dynamics: [Who controls what? 1-2 sentences]
 Faction Hints: [Mention 2-3 major groups to expand in Step 2]
 
-=== COMPLETION CHECK ===
+--- END OF LIVING FILE FORMAT ---
+
+IMPORTANT: The Living File should END after "Faction Hints". Do NOT include completion checks, instructions, or meta-commentary in the Living File itself.
+
+=== COMPLETION CHECK (FOR YOUR REFERENCE ONLY - NOT IN LIVING FILE) ===
 
 Your FIRST response should already have all 6 areas filled completely.
 
@@ -188,11 +192,19 @@ When player says they're satisfied (or clicks Next), they move on to Step 1.
 
 === JSON RESPONSE FORMAT ===
 
+You MUST respond with valid JSON only. No text before or after the JSON object.
+
 {
   "message": "Your conversational response (use \\n\\n for blank lines between paragraphs)",
   "livingFile": "Updated Living File in the EXACT format above",
   "coverageComplete": true/false
 }
+
+CRITICAL:
+- Return ONLY the JSON object, nothing else
+- Ensure all strings are properly escaped (use \\" for quotes inside strings)
+- Do not add any explanatory text before or after the JSON
+- Make sure all brackets and braces are balanced
 
 CRITICAL REMINDERS:
 1. FIRST RESPONSE: Must be a COMPLETE world draft with all 6 areas filled (no "[To be defined]")
@@ -203,10 +215,15 @@ CRITICAL REMINDERS:
 6. Set "coverageComplete": true on first response (since you drafted everything)
 7. Subsequent responses: Update Living File based on player feedback only
 
-IMPORTANT: Your "livingFile" field must ALWAYS contain the FULL Living File in the exact format shown above, even if only one small detail changed. Never return just the changed section - always return the complete document.
+IMPORTANT ABOUT LIVING FILE:
+- The "livingFile" field contains ONLY the structured world data (ends at "Faction Hints")
+- Do NOT include completion checks, questions, or instructions in the Living File
+- The Living File is pure data - all conversation goes in the "message" field
+- Your "livingFile" field must contain the FULL Living File in the exact format shown above
+- Never return just the changed section - always return the complete document from "--- WORLD CONTEXT:" to "Faction Hints:"
 
 WORKFLOW:
-- First response = Complete draft of everything + ask player to review
+- First response = Complete draft of everything + ask player to review (in "message" field)
 - Follow-up responses = Update based on player's specific feedback
 - Player can move to next step anytime after first response`,
     step1: `You are a World Building Assistant helping define Game Rules & Mechanics for a D&D-style adventure.

@@ -78,18 +78,47 @@ IMPORTANT: Use the Narrative Style "${wizardData.narrativeStyle}" in your conver
       throw new Error("AI returned an empty response. Please try again.");
     }
 
-    // Parse JSON response
+    // Parse JSON response with multiple fallback strategies
     let result;
+
+    // Strategy 1: Direct parse
     try {
       result = JSON.parse(messageContent);
     } catch (parseError) {
-      // Try to extract JSON from markdown code blocks
-      const jsonMatch = messageContent.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
+      console.log("⚠️ Direct JSON parse failed, trying extraction strategies...");
+
+      // Strategy 2: Extract from markdown code blocks
+      let jsonMatch = messageContent.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
       if (jsonMatch) {
-        result = JSON.parse(jsonMatch[1]);
-      } else {
-        console.error("❌ Failed to parse AI response as JSON:", messageContent.substring(0, 200));
-        throw new Error("AI returned invalid JSON format. Please try again.");
+        try {
+          result = JSON.parse(jsonMatch[1]);
+          console.log("✅ Extracted JSON from markdown code block");
+        } catch (innerError) {
+          console.error("❌ Markdown extraction failed");
+        }
+      }
+
+      // Strategy 3: Find first { to last } (handles text before/after JSON)
+      if (!result) {
+        const firstBrace = messageContent.indexOf('{');
+        const lastBrace = messageContent.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          const extracted = messageContent.substring(firstBrace, lastBrace + 1);
+          try {
+            result = JSON.parse(extracted);
+            console.log("✅ Extracted JSON from text (first { to last })");
+          } catch (innerError) {
+            console.error("❌ Brace extraction failed");
+          }
+        }
+      }
+
+      // If all strategies failed
+      if (!result) {
+        console.error("❌ All JSON parsing strategies failed");
+        console.error("Response preview:", messageContent.substring(0, 500));
+        console.error("Full response:", messageContent);
+        throw new Error("AI returned invalid JSON format. Response logged to console - please check for details.");
       }
     }
 
