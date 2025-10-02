@@ -110,7 +110,7 @@ Respond in JSON format:
           <!-- Right: Living File -->
           <div class="panel">
             <h2>Living File</h2>
-            <div id="fileBody" class="muted" style="white-space: pre-line;"></div>
+            <div id="fileBody" class="muted" style="white-space: pre-wrap; line-height: 1.8; font-family: monospace; font-size: 14px;"></div>
           </div>
         </div>
 
@@ -286,14 +286,22 @@ Respond in JSON format:
       // Render existing chat history
       chatHistory.forEach(msg => {
         const isUser = msg.role === 'user';
-        chatContainer.innerHTML += `
-          <div style="margin-bottom: 15px;">
-            <div style="color: #888; font-size: 12px; margin-bottom: 5px;">${isUser ? '👤 You' : '🤖 World Building Assistant'}</div>
-            <div style="background: ${isUser ? '#1e3a5f' : '#2a2a2a'}; padding: 10px; border-radius: 4px; color: #e0e0e0; white-space: pre-wrap;">
-              ${msg.content}
-            </div>
-          </div>
-        `;
+
+        // Create message element
+        const msgDiv = document.createElement('div');
+        msgDiv.style.marginBottom = '15px';
+
+        const labelDiv = document.createElement('div');
+        labelDiv.style.cssText = 'color: #888; font-size: 12px; margin-bottom: 5px;';
+        labelDiv.textContent = isUser ? '👤 You' : '🤖 World Building Assistant';
+
+        const contentDiv = document.createElement('div');
+        contentDiv.style.cssText = `background: ${isUser ? '#1e3a5f' : '#2a2a2a'}; padding: 10px; border-radius: 4px; color: #e0e0e0; white-space: pre-wrap; line-height: 1.6;`;
+        contentDiv.textContent = msg.content; // Use textContent to preserve line breaks
+
+        msgDiv.appendChild(labelDiv);
+        msgDiv.appendChild(contentDiv);
+        chatContainer.appendChild(msgDiv);
       });
 
       // Auto-scroll to bottom
@@ -327,18 +335,26 @@ Respond in JSON format:
       const userMessage = chatInput.value.trim();
       if (!userMessage) return;
 
-      // Add user message to chat
-      wizardData.chatHistory[stepKey].push({ role: 'user', content: userMessage });
+      // Disable input and show loading BEFORE adding to chat
+      const originalValue = chatInput.value;
       chatInput.value = '';
       chatInput.disabled = true;
       sendBtn.disabled = true;
-      loadingIndicator.style.display = 'block';
+
+      // Add user message to chat
+      wizardData.chatHistory[stepKey].push({ role: 'user', content: userMessage });
 
       // Save to localStorage
       localStorage.setItem(`wizard_chat_${stepKey}`, JSON.stringify(wizardData.chatHistory[stepKey]));
 
-      // Re-render to show user message
+      // Re-render to show user message AND loading indicator
       renderChatUI(config);
+
+      // Force the loading indicator to show (it gets recreated in renderChatUI)
+      const newLoadingIndicator = el.inputArea.querySelector('#loadingIndicator');
+      if (newLoadingIndicator) {
+        newLoadingIndicator.style.display = 'block';
+      }
 
       try {
         // Call AI to get response
@@ -364,6 +380,7 @@ Respond in JSON format:
         alert(`Error: ${error.message}`);
         // Remove the user message on error
         wizardData.chatHistory[stepKey].pop();
+        localStorage.setItem(`wizard_chat_${stepKey}`, JSON.stringify(wizardData.chatHistory[stepKey]));
         renderChatUI(config);
       }
     }
