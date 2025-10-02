@@ -68,22 +68,27 @@ export function renderStep0Form(wizardData, el, onComplete) {
 }
 
 export function getStep0InitialMessage(wizardData) {
-  return `Perfect! I see you've started with:
+  return `Perfect! I've created a draft Living File based on your inputs:
 
 <strong>World Name:</strong> ${wizardData.worldName}
 <strong>Genre:</strong> ${wizardData.worldGenre}
 <strong>Main Conflict:</strong> ${wizardData.worldConflict}
 <strong>Narrative Style:</strong> ${wizardData.narrativeStyle}
 
-Now let's build the complete world context! I'll help you define:
-- Full premise and conflict origin
+Check the <strong>Living File</strong> panel on the right — I've drafted the initial world context based on what you provided.
+
+Now let's refine it together! I'll help you add:
+- More details about the conflict origin
 - Main objectives (win/lose conditions)
 - Key locations (3-5 important places)
 - Opposing forces and factions
 
-I'll narrate in a <strong>${wizardData.narrativeStyle}</strong> style throughout your adventure.
+<strong>Review the Living File, then:</strong>
+- If you want to expand on something, just tell me (e.g., "Add more about the two entities")
+- If you want to add something new, tell me what (e.g., "Let's define 3 key locations")
+- If it looks good, say "Continue" and I'll ask about the next area
 
-Let's start - tell me more about the conflict. How did it begin? What's at stake?`;
+What would you like to add or refine first?`;
 }
 
 export function buildStep0Context(wizardData, userMessage) {
