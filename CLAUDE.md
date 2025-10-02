@@ -49,14 +49,85 @@ The game uses Supabase to persist three types of data:
 
 ## World Creation Wizard
 
-The wizard uses a **two-panel collaborative design**:
+### Architecture (Refactored - 396 lines main + 9 modules)
 
-- **Left Panel (Conversation)**: Shows step description and input fields for user to fill out
-- **Right Panel (Living File)**: Structured summary that updates in real-time as user types
-- **Sidebar**: Shows 4 clickable steps (Theme & Tone → Rules & Mechanics → NPCs & Factions → Character Creation)
-- **Navigation**: Back/Next buttons, data persists across steps, Finish button navigates to Main Game UI with wizard data
+**Modular Structure** - Split from monolithic 2050-line file into maintainable modules:
 
-**Current implementation**: User fills input fields manually. **Future**: AI conversation to collaboratively build world via chat, with AI extracting structured data to Living File.
+- **`worldWizard.js` (396 lines)** - Main orchestrator
+  - Step navigation and state management
+  - Loads guidelines from localStorage or defaults
+  - Handles "Edit Guidelines" modal for advanced customization
+  - Saves world data to localStorage on completion
+
+- **`/wizardSteps/` modules**:
+  - `step0-theme.js` - Theme & Tone (pre-fill form + AI expansion)
+  - `step1-mechanics.js` - Rules & Mechanics (defaults or custom)
+  - `step2-npcs.js` - NPCs & Factions (dynamic list + romance support)
+  - `step3-character.js` - Character Creation (point-buy system)
+  - `sharedChat.js` - Hybrid chat UI logic shared across steps
+  - `aiAssistant.js` - GPT API integration for world building
+  - `livingFile.js` - Formatting utilities for Living File display
+  - `guidelines.js` (651 lines) - AI conversation guidelines per step
+
+### UI Design - Two-Panel Collaborative Mode
+
+- **Left Panel (Conversation)**: Pre-fill form → AI chat expansion
+- **Right Panel (Living File)**: Structured summary updated by AI in real-time
+- **Sidebar**: 4 clickable steps (Theme & Tone → Rules & Mechanics → NPCs & Factions → Character Creation)
+- **Navigation**: Back/Next buttons, data persists across steps, Finish button navigates to Main Game UI
+
+### Hybrid Workflow
+
+1. **User fills pre-fill form** (e.g., World Name, Genre, Main Conflict, Narrative Style)
+2. **Auto-generation triggers** - AI immediately creates draft Living File with initial proposal
+3. **AI conversation expands details** - User refines via chat, AI updates Living File
+4. **Living File grows** - Structured data builds incrementally per step
+
+### Step 0: Theme & Tone - Pre-fill Fields
+
+Required fields before AI expansion:
+- **World Name** - e.g., "The Shattered Realms", "Neo-Tokyo 2099"
+- **Genre/Theme** - e.g., "Dark Fantasy", "Cyberpunk", "Steampunk"
+- **Main Conflict** - Brief 1-2 sentence description
+- **Narrative Style** - Dropdown with 6 options:
+  - Descriptive & Atmospheric (detailed environments, vivid imagery)
+  - Action-Focused (fast-paced, emphasis on what happens)
+  - Dramatic & Theatrical (emotional, intense moments)
+  - Casual & Conversational (relaxed, friendly tone)
+  - Grim & Brutal (dark, unforgiving, visceral)
+  - Mysterious & Enigmatic (cryptic, haunting atmosphere)
+
+After form submission → AI auto-generates draft Living File + asks ONE focused question
+
+### AI Conversation Guidelines
+
+**Strict rules enforced via guidelines.js:**
+- **FORMATTING**: Short paragraphs (2-3 sentences), blank lines between paragraphs, bullet points for lists
+- **QUESTION LIMIT**: Ask MAXIMUM 1 question per response (never 2+ questions)
+- **FIRST RESPONSE**: Auto-generated draft Living File based on user's pre-fill inputs
+- **JSON RESPONSE FORMAT**: `{ "message": "...", "livingFile": "...", "coverageComplete": true/false }`
+- **LINE BREAKS**: Use `\n\n` in message field for blank lines between paragraphs
+
+### Layout & Scrolling
+
+**Fixed-height flexbox layout** ensures buttons always visible:
+- `.wizard` - 100vh height, flex-direction: column
+- `.wizard-content` - Flex: 1, overflow: hidden
+- `.panel` - Individual overflow-y scrollbars (conversation panel and living file panel scroll independently)
+- Headers and input areas - `flex-shrink: 0` to prevent collapse
+- Button bar - Always visible at bottom
+
+### Auto-Generation Feature
+
+When user completes pre-fill form and clicks "Generate":
+1. Form data saved to `wizardData`
+2. Chat UI renders with "Generating your world draft..." message
+3. **Async auto-trigger** - `sharedChat.js` immediately calls AI with initial prompt:
+   - "Please create a draft Living File based on the inputs I provided. Fill in what you can infer, and mark incomplete areas as '[To be defined]'. Then ask me ONE specific question about what to expand on first."
+4. AI responds with draft Living File + ONE focused question
+5. User continues conversation to refine and expand
+
+**No manual "Continue" required** - AI conversation starts immediately after form submission.
 
 ## Game Mechanics
 
@@ -78,7 +149,15 @@ The wizard uses a **two-panel collaborative design**:
 
 ### ✅ Frontend Complete
 - **Entry Screen** - New World and Load World buttons
-- **World Wizard** - 4-step creation with input fields, live-updating Living File, data persistence across steps
+- **World Wizard** - ✅ **REFACTORED & ENHANCED**
+  - **Modular architecture**: 396-line orchestrator + 9 specialized modules (80% code reduction from 2050 lines)
+  - **Hybrid AI-assisted workflow**: Pre-fill forms → Auto-generation → AI chat expansion
+  - **Step 0 (Theme & Tone)**: World Name, Genre, Main Conflict, Narrative Style (6 dropdown options)
+  - **Auto-generation**: First AI response auto-triggers with draft Living File
+  - **AI conversation quality**: Strict guidelines enforce 1 question max, proper formatting with line breaks
+  - **Fixed scrolling**: Individual panel scrollbars, buttons always visible at bottom
+  - **Guideline editor**: Advanced users can customize AI behavior per step
+  - Data persists across steps in localStorage
 - **Main Game UI** - Chat narration, choice buttons, free text input, character panel (stats + skills), animated d20 dice roller
 - **Top Bar** - Save, Settings, Mode toggle, Image Gen, Gallery, Menu (all functional)
 - **Modals** - Image generation modal, gallery modal, load world modal
@@ -86,18 +165,26 @@ The wizard uses a **two-panel collaborative design**:
 
 ### ✅ Backend Integration - GPT API
 - **GPT API** - ✅ WORKING!
-  - Location: `js/services/gpt.js`
-  - Model: `gpt-5-mini-2025-08-07`
-  - API key stored in localStorage (user enters via Settings modal)
-  - System prompt includes world theme, character stats, recent scene log
-  - Returns narration, choices, dice requirements
-  - **Important GPT-5-mini quirks:**
-    - ❌ Do NOT use `response_format: { type: "json_object" }` - causes empty responses with all tokens used for reasoning
-    - ❌ Do NOT use `temperature` parameter - only default (1) is supported
-    - ✅ Use `max_completion_tokens` (not `max_tokens`)
-    - ✅ Set high token limit (3500) to account for reasoning tokens (~2000) + actual response (~1500)
-    - ✅ Parse JSON from response (handles both raw JSON and markdown code blocks)
-    - ⚠️ **Known issue**: Complex prompts may consume all tokens in reasoning, leaving empty response. Solution: simplify prompts and increase token limit.
+  - **Normal Mode (Game)**: `js/services/gpt.js`
+    - Model: `gpt-5-mini-2025-08-07`
+    - API key stored in localStorage (user enters via Settings modal)
+    - System prompt includes world theme, character stats, recent scene log
+    - Returns narration, choices, dice requirements
+    - **Important GPT-5-mini quirks:**
+      - ❌ Do NOT use `response_format: { type: "json_object" }` - causes empty responses with all tokens used for reasoning
+      - ❌ Do NOT use `temperature` parameter - only default (1) is supported
+      - ✅ Use `max_completion_tokens` (not `max_tokens`)
+      - ✅ Set high token limit (3500) to account for reasoning tokens (~2000) + actual response (~1500)
+      - ✅ Parse JSON from response (handles both raw JSON and markdown code blocks)
+      - ⚠️ **Known issue**: Complex prompts may consume all tokens in reasoning, leaving empty response. Solution: simplify prompts and increase token limit.
+
+  - **World Building Mode (Wizard)**: `js/components/wizardSteps/aiAssistant.js`
+    - Model: `gpt-5-mini-2025-08-07` (max_completion_tokens: 16000 for longer context)
+    - Uses same API key from localStorage
+    - Guidelines loaded from localStorage or defaults (per step)
+    - Context includes user's pre-fill inputs + chat history
+    - Returns JSON: `{ "message": "...", "livingFile": "...", "coverageComplete": true/false }`
+    - Auto-triggered on form submission (no manual "Continue" needed)
 
 ### ✅ Backend Integration - Mature Mode (Grok API)
 - **Grok API integration** - ✅ Working!

@@ -143,11 +143,22 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
 
 ### ✅ Completed (Frontend Skeleton)
 - **Entry Screen** - New World / Load World buttons with full navigation
-- **World Creation Wizard** - 4-step wizard with input fields and live-updating Living File
-  - Step 1: Theme & Tone (3 input fields)
-  - Step 2: Rules & Mechanics (1 input field)
-  - Step 3: NPCs & Factions (3 input fields)
-  - Step 4: Character Creation (3 input fields)
+- **World Creation Wizard** - ✅ **REFACTORED & ENHANCED** - Modular hybrid AI-assisted wizard
+  - **Modular Architecture**: Split into separate files for maintainability
+    - `worldWizard.js` (396 lines) - Main orchestrator
+    - `wizardSteps/step0-theme.js` - Theme & Tone with pre-fill + AI chat
+    - `wizardSteps/step1-mechanics.js` - Rules & Mechanics with defaults/custom
+    - `wizardSteps/step2-npcs.js` - NPCs & Factions with dynamic list + romance focus
+    - `wizardSteps/step3-character.js` - Character Creation with point-buy system
+    - `wizardSteps/sharedChat.js` - Hybrid chat UI logic
+    - `wizardSteps/aiAssistant.js` - GPT API integration
+    - `wizardSteps/guidelines.js` - AI conversation guidelines
+  - **Step 0 (Theme & Tone)**: Pre-fill (World Name, Genre, Conflict, Narrative Style) → AI expands
+  - **Step 1 (Rules & Mechanics)**: Choose defaults or custom → AI helps define systems
+  - **Step 2 (NPCs & Factions)**: Dynamic NPC list → AI creates detailed profiles with romance support
+  - **Step 3 (Character Creation)**: Hybrid form + point-buy (27pts) → AI generates backstory
+  - **Auto-generation**: First AI response auto-triggers with draft Living File
+  - **Guideline Editor**: Advanced users can customize AI behavior per step
   - Data persists across step navigation
   - Finishes into Main Game UI with wizard data
 - **Main Game UI** - Complete game interface
@@ -211,12 +222,13 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
 1. ✅ ~~**Connect GPT API**~~ - DONE! Working with gpt-5-mini-2025-08-07
 2. ✅ ~~**Add Mature Mode AI**~~ - DONE! Working with grok-4-fast-reasoning
 3. ✅ ~~**Enhance Dice UI**~~ - DONE! Pulsing button + compact info panel
-4. **Improve World Creation Wizard** - AI-assisted conversation mode for world building
+4. ✅ ~~**Improve World Creation Wizard**~~ - DONE! Refactored with AI-assisted hybrid mode
 5. **Refine AI Prompts** - Better tone/style consistency, improve choice quality
-6. **Connect Supabase** - Implement save/load system (Scene Log, Save File, Progress Summary)
-7. **Wire up Image Generation API** - Real image generation from prompts
-8. **Implement Autosave** - Every turn + checkpoint (20 turns) saves
-9. **Polish & Testing** - End-to-end gameplay testing
+6. **Test & Polish Wizard** - End-to-end testing of all 4 steps, fix AI conversation flow
+7. **Connect Supabase** - Implement save/load system (Scene Log, Save File, Progress Summary)
+8. **Wire up Image Generation API** - Real image generation from prompts
+9. **Implement Autosave** - Every turn + checkpoint (20 turns) saves
+10. **Polish & Testing** - End-to-end gameplay testing
 
 ## Session Notes (for next session)
 - ✅ GPT-5-mini integration working (Normal Mode)
