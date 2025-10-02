@@ -166,34 +166,62 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
   - Game → Settings → Wizard ✅
 - **Romance Mode** - Warning message (not yet implemented)
 
-### ⚙️ Partially Implemented (Backend Integration)
-- **GPT API integration** - ✅ Working!
+### ✅ Backend Integration - Complete
+- **GPT API integration (Normal Mode)** - ✅ Working!
   - Model: `gpt-5-mini-2025-08-07`
   - Settings modal for API key (stored in localStorage)
   - Scene log tracking (last 10 turns)
-  - Dice roll integration with GPT outcomes
-  - **Known issues with GPT-5-mini:**
+  - Dice roll integration with outcomes
+  - **Known GPT-5-mini quirks:**
     - Cannot use `response_format: { type: "json_object" }` - causes empty responses
     - Cannot customize `temperature` - only default (1) supported
     - Uses `max_completion_tokens` instead of `max_tokens`
     - Reasoning tokens can consume all tokens if not careful
-- **Supabase database connection** - ❌ Not yet connected (placeholder save/load)
-- **Image generation API** - ❌ Using placeholder images
-- **Autosave system** - ❌ Not yet implemented (every turn + checkpoint saves)
-- **Romance mode AI** - ❌ Shows warning, not implemented
+
+- **Grok API integration (Mature Mode)** - ✅ Working!
+  - Model: `grok-4-fast-reasoning`
+  - Separate API key field in Settings modal
+  - Supports JSON mode properly: `response_format: { type: "json_object" }`
+  - Temperature: 0.8 for creative mature content
+  - Seamless mode switching mid-game
+  - **Visual indicators:**
+    - Mode toggle button: "Mode: Normal" ↔ "Mode: Mature 🔞"
+    - Loading indicator shows active DM: "🎲 GPT DM is thinking" or "🎲 Grok DM is thinking"
+    - Console logs verify which API is called
+  - Both APIs share same context (world, character, scene log)
+
+### ⚙️ Partially Implemented
+- **Dice Roll UI** - ✅ Enhanced with visual feedback
+  - Compact info panel shows check type + DC when roll required
+  - Button pulses with orange glow animation
+  - Choices hidden until dice rolled (expected behavior)
+
+### ❌ Not Yet Implemented
+- **Supabase database connection** - Placeholder save/load (js/services/supabase.js exists but empty)
+- **Image generation API** - Using placeholder images (js/services/imageService.js exists but empty)
+- **Autosave system** - Not yet implemented (every turn + checkpoint saves)
 
 ---
 
 ## Next Steps
 1. ✅ ~~**Connect GPT API**~~ - DONE! Working with gpt-5-mini-2025-08-07
-2. **Improve GPT Integration** - Fine-tune prompts for better JSON output reliability
-3. **Connect Supabase** - Implement save/load system (Scene Log, Save File, Progress Summary)
-4. **Wire up Image Generation API** - Real image generation from prompts
-5. **Implement Autosave** - Every turn + checkpoint (20 turns) saves
-6. **Add Romance Mode AI** - Separate model for mature content
-7. **Polish & Testing** - End-to-end gameplay testing
+2. ✅ ~~**Add Mature Mode AI**~~ - DONE! Working with grok-4-fast-reasoning
+3. ✅ ~~**Enhance Dice UI**~~ - DONE! Pulsing button + compact info panel
+4. **Improve World Creation Wizard** - AI-assisted conversation mode for world building
+5. **Refine AI Prompts** - Better tone/style consistency, improve choice quality
+6. **Connect Supabase** - Implement save/load system (Scene Log, Save File, Progress Summary)
+7. **Wire up Image Generation API** - Real image generation from prompts
+8. **Implement Autosave** - Every turn + checkpoint (20 turns) saves
+9. **Polish & Testing** - End-to-end gameplay testing
 
 ## Session Notes (for next session)
-- GPT-5-mini integration working but needs prompt refinement for better JSON parsing
-- User has API key set up and working
-- Next: Either improve GPT prompts OR move to Supabase integration  
+- ✅ GPT-5-mini integration working (Normal Mode)
+- ✅ Grok-4-Fast integration working (Mature Mode)
+- ✅ Mode switching seamless with visual indicators
+- ✅ Dice UI enhanced with pulsing button and compact info panel
+- 📋 **Next Priority**: World Creation Wizard improvements
+  - Current: Manual input fields
+  - Goal: AI-assisted conversation mode
+  - Once world tone/style established, gameplay will be more cohesive
+- ⚠️ Known behavior: Choices hidden when dice roll required (by design)
+- 💡 Both AIs return choices properly, but prompts may need refinement for better quality  

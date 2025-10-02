@@ -177,6 +177,9 @@ All modals use overlay pattern (no full page replacement):
 ```
 
 ### Debugging Tips
-- Check browser console for "GPT Response:" logs
-- Look for `completion_tokens_details.reasoning_tokens` - if this equals total tokens, response will be empty
-- If JSON parsing fails, check if GPT wrapped response in markdown code blocks
+- Check browser console for API routing logs:
+  - `🎲 Calling Grok-4-Fast (Mature Mode) API...` or `🎲 Calling GPT-5-mini (Normal Mode) API...`
+  - `✅ Grok response received:` or `✅ GPT response received:` with full response object
+- Look for `completion_tokens_details.reasoning_tokens` (GPT-5-mini) - if this equals total tokens, response will be empty
+- If JSON parsing fails, check if AI wrapped response in markdown code blocks
+- Verify which DM is active by checking the loading indicator: "🎲 GPT DM is thinking" vs "🎲 Grok DM is thinking"
