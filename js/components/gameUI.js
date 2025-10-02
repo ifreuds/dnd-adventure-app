@@ -241,10 +241,16 @@ export function renderGameUI(container, worldData = {}) {
         const checkMatch = result.diceContext?.match(/^([A-Z][a-z]+\s*\([A-Za-z]+\))/);
         const checkType = checkMatch ? checkMatch[1] : "Check Required";
 
+        // Extract just the check description, remove spoilers about success/failure
+        // Split on keywords like "Success:", "Failure:", "success:", "failure:"
+        const contextWithoutSpoilers = result.diceContext
+          ?.split(/\.\s*(?:Success|Failure|success|failure)[:;]/)[0]
+          ?.trim() || "A roll is needed!";
+
         // Show dice info panel
         el.diceInfo.style.display = "block";
         el.diceCheckType.textContent = checkType;
-        el.diceContext.textContent = result.diceContext || "A roll is needed!";
+        el.diceContext.textContent = contextWithoutSpoilers;
         el.diceDC.textContent = result.dc || 13;
 
         // Light up the dice button
@@ -352,6 +358,10 @@ export function renderGameUI(container, worldData = {}) {
         setTimeout(async () => {
           const dc = pendingDiceRoll?.dc || 13;
           const success = finalRoll >= dc;
+
+          // Show loading indicator for DM thinking
+          const dmName = isMatureMode ? "Grok" : "GPT";
+          el.choiceButtons.innerHTML = `<div class="dm-thinking">🎲 ${dmName} DM is thinking<span class="spinner"></span></div>`;
 
           // Update scene log with dice result
           if (sceneLog.length > 0) {
