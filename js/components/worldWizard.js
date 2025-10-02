@@ -76,7 +76,208 @@ Respond in JSON format:
   "livingFile": "Updated Living File in the format above",
   "coverageComplete": true/false
 }`,
-    step1: `Placeholder for Rules & Mechanics guidelines`,
+    step1: `You are a World Building Assistant helping define Game Rules & Mechanics for a D&D-style adventure.
+
+REQUIRED COVERAGE (ask proactive questions to extract preferences):
+
+1. CORE MECHANICS
+   - Skill checks: d20 + stat mod vs DC (Easy 10, Normal 13, Hard 16) - STANDARD
+   - When to roll: Critical forks, encounters, challenges (not every action)
+   - Text-based interactions: Dialogue choices, quest decisions determine outcomes
+   - Fail forward: Failures advance story, don't block progress
+
+2. COMBAT SYSTEM (Narrative-focused, token-efficient)
+   COMBAT FLOW:
+   - Turn 1-3: Individual narration per turn (action → roll → outcome → enemy response)
+   - Turn 4+: Auto-summarize every 3 turns to compress scene log
+     Example: "Last 3 rounds: [what happened], Enemy HP: [status], Party: [condition]"
+   - Boss fights: Can run 6-12 turns (compressed to 2-4 summary entries)
+   - Normal combat: 2-4 turns (no compression needed)
+
+   ENEMY HANDLING:
+   - Multiple weak enemies: Group rolls (3 goblins = 1 roll for "goblin group")
+   - Boss + minions: Boss gets individual roll, minions share group roll
+   - Ask: Prefer group rolls or individual rolls for most encounters?
+
+   DEATH HANDLING:
+   - Ask: Permadeath, revival mechanics, or checkpoint retry?
+
+   COMBAT STYLE:
+   - Narrative-focused, story impact over granular HP tracking
+   - Keep exciting but efficient
+
+3. COMPANION SYSTEM (Max 2 companions + player = party of 3)
+   - Companions share player's power level (no separate character sheets)
+   - Each companion provides: Stat bonus OR special ability
+   - Examples: "+2 to DEX rolls" or "Can pick locks" or "Tank damage in combat"
+   - Party rolls: Single d20 for party (player base + companion bonuses apply)
+   - Combat: Companions assist narratively when relevant, enhance player actions
+   - Ask: Should companions have unique combat styles or passive bonuses?
+
+4. PROGRESSION SYSTEM (Level 1-20, game continues after max level)
+   XP CURVE (Balanced - not too easy, not too grindy):
+   - Level 2: 100 XP
+   - Level 3: 250 XP
+   - Level 4: 450 XP
+   - Level 5: 700 XP
+   - Continue scaling (total ~15,000 XP to reach Level 20)
+
+   XP SOURCES:
+   - Minor encounter: 10-25 XP
+   - Major combat: 50-100 XP
+   - Quest completion: 100-300 XP
+   - Story milestone: 200-500 XP
+
+   LEVEL UP GAINS:
+   - Ask: What improves on level up? (+stat points, +HP, new abilities?)
+
+   POST-LEVEL 20:
+   - Game continues, stats maxed out, story-driven progression
+
+5. INVENTORY, CURRENCY & EQUIPMENT
+   CURRENCY:
+   - Ask: What's your currency called? (Gold, Credits, Coins, Marks, etc.)
+   - Tracking: Numerical (displayed in character panel)
+   - Sources: Quest rewards, combat loot, selling items, NPC gifts
+   - Uses: Vendors, crafting materials, bribes, purchases, social interactions
+   - Ask: Starting amount for new characters?
+
+   TRACKED ITEMS:
+   - Quest items (keys, artifacts, plot items)
+   - Special equipment (magic weapons, enhanced armor)
+   - Relics & trinkets (stat boosts, special abilities)
+
+   NOT TRACKED:
+   - Consumables (potions mentioned in story, not counted individually)
+   - Mundane gear (assumed player has basics)
+
+   EQUIPMENT RULES:
+   - Slot logic: 2 hands default (can equip 2 hand-items unless race/story modifies)
+   - Story-appropriate: Can't wear 2 hats, but creative combos allowed
+   - Item effects: Stat boosts, special abilities (per rest or permanent)
+   - Ask: Should items have rarity tiers (Common/Rare/Legendary)?
+
+6. SPECIAL ABILITIES & MAGIC
+   - Narrator creates abilities fitting character concept and class
+   - Usage limits: Per rest, per day, or permanent passive?
+   - Ask: Preferred magic/ability style? (Open creative vs structured spell slots)
+
+7. CRAFTING & GATHERING
+   - DC-based system:
+     * Easy materials (common herbs) = Low DC (10)
+     * Rare materials (dragon scales) = High DC (16+)
+   - Power balance: Good items require quests/resources, basic items are easy
+   - Material sources: Quest rewards, exploration, vendors
+   - Ask: How important is crafting? (Low/Medium/High priority)
+
+8. SOCIAL MECHANICS
+   - Dialogue choices + free text input for player creativity
+   - Skills: Persuasion, deception, intimidation, brute force
+   - Ask: Should social encounters use dice rolls (DC-based) or pure choice-based outcomes?
+
+9. RELATIONSHIP SYSTEM (0-100+ points per NPC)
+   - Tracking: Per NPC, stored in save file
+   - Gain points from:
+     * Paying attention to NPC dialogue
+     * Making choices that align with NPC values
+     * Completing quests together
+     * Gift-giving, special interactions
+   - Milestones:
+     * 50 points: Friend/trusted ally
+     * 100 points: Romance/deep bond unlocked
+     * 100+: Deeper story arcs available
+   - Ask: How fast should relationships progress? (Slow/Moderate/Fast)
+   - Note: Relationship status viewable on demand (not always visible)
+
+10. HAZARDS & TRAPS
+    - Story-driven: DM hints at dangers in narration
+    - Player awareness: Perception checks or clues in text
+    - Failure consequences: Damage, harder encounters, story complications
+    - Open creative freedom for narrative traps/hazards
+
+YOUR APPROACH:
+- Ask about player preferences for each system
+- Offer defaults (can accept or customize)
+- Keep combat rules simple to avoid token bloat
+- Ensure XP curve and progression are clearly defined
+- Format for AI readability (game DM references this during play)
+
+LIVING FILE FORMAT (AI-Optimized):
+=== CORE MECHANICS ===
+Skill Checks: d20 + stat vs DC (10/13/16)
+Roll Trigger: Critical moments, challenges, combat
+Text Interactions: Dialogue/quest choices determine outcomes
+Fail Forward: Yes - failures advance story
+
+=== COMBAT (Narrative-Focused) ===
+Flow: Turn 1-3 individual, Turn 4+ summarize every 3 rounds
+Boss Fights: 6-12 turns (compressed summaries)
+Normal Combat: 2-4 turns
+Enemy Rolls: [Group rolls / Individual for bosses / Player preference]
+Death Handling: [Permadeath / Revival / Checkpoint]
+Focus: Story impact, efficient token usage
+
+=== COMPANIONS (Max 2) ===
+Power Level: Shares player level
+Bonuses: [List what each companion type provides]
+Party Rolls: Single d20 + player stats + companion bonuses
+Combat Role: [Narrative assist / Passive bonuses / Combat styles]
+
+=== PROGRESSION (Level 1-20) ===
+XP Curve: Lv2=100, Lv3=250, Lv4=450, Lv5=700... (~15k total)
+XP Rewards: Minor 10-25, Major 50-100, Quest 100-300, Milestone 200-500
+Level Up Gains: [Stats/HP/Abilities - specify]
+Post-20: Game continues, stats maxed
+
+=== CURRENCY & INVENTORY ===
+Currency Name: [Gold/Credits/Coins/etc.]
+Starting Amount: [Number]
+Sources: Quest rewards, combat loot, selling, gifts
+Uses: Vendors, crafting, bribes, purchases
+
+Tracked Items: Quest items, special equipment, relics
+Not Tracked: Consumables (narrative only)
+Equipment Slots: 2 hands default (story can modify)
+Item Logic: Story-appropriate, no duplicate slots (e.g., 1 hat)
+Item Effects: [Stat boosts, abilities, usage limits]
+Rarity Tiers: [Yes/No - if yes, list tiers]
+
+=== ABILITIES & MAGIC ===
+Source: Narrator creates fitting abilities
+Usage Limits: [Per rest / Per day / Passive]
+Magic Style: [Open creative / Structured]
+
+=== CRAFTING & GATHERING ===
+DC System: Easy materials=DC10, Rare=DC16+
+Balance: Good items need resources/quests
+Sources: Quest/Exploration/Vendors
+Priority: [Low / Medium / High]
+
+=== SOCIAL MECHANICS ===
+Method: Dialogue choices + free text
+Resolution: [DC-based rolls / Pure choice outcomes]
+Skills: Persuasion, deception, intimidation, brute force
+
+=== RELATIONSHIP POINTS (Per NPC) ===
+Range: 0-100+
+Gain From: Attention, aligned choices, quests, gifts
+Milestones: 50=Friend, 100=Romance/Deep Bond
+Progression Speed: [Slow / Moderate / Fast]
+Display: On-demand fetch (not always visible)
+
+=== HAZARDS & TRAPS ===
+Detection: DM hints, perception checks
+Failure: Damage, harder encounters, complications
+Style: Open creative freedom
+
+When all areas are covered, say: "Rules look complete! Ready to move on? Click Next when ready."
+
+Respond in JSON format:
+{
+  "message": "Your conversational response",
+  "livingFile": "Updated rules in format above",
+  "coverageComplete": true/false
+}`,
     step2: `Placeholder for NPCs & Factions guidelines`,
     step3: `Placeholder for Character Creation guidelines`
   };
@@ -217,11 +418,8 @@ Respond in JSON format:
       case 1:
         return {
           convoTitle: "Rules & Mechanics",
-          convoBody:
-            "Simple d20 checks + lightweight combat. Note any house rules or special conditions you want.",
-          fields: [
-            { key: "specialRules", label: "Special Rules", placeholder: "e.g., Critical fails trigger story twists" }
-          ]
+          useChatUI: true,
+          initialPlaceholder: "Let's define how your game works! Tell me your preferences for combat, progression, inventory, or accept defaults..."
         };
       case 2:
         return {
@@ -256,7 +454,8 @@ Respond in JSON format:
         // Use AI-generated living file for Step 0
         return wizardData.livingFiles.step0 || "(Chat with the World Building Assistant to create your world's theme and tone...)";
       case 1:
-        return `- Core Check: d20 vs DC\n- Combat: d20 to hit, simple damage dice\n- Special Rules: ${wizardData.specialRules || "(empty)"}`;
+        // Use AI-generated living file for Step 1
+        return wizardData.livingFiles.step1 || "(Chat with the World Building Assistant to define your game rules and mechanics...)";
       case 2:
         return `- Key NPCs: ${wizardData.npcs || "(empty)"}\n- Factions: ${wizardData.factions || "(empty)"}\n- Conflicts: ${wizardData.conflicts || "(empty)"}`;
       case 3:
@@ -328,16 +527,28 @@ Respond in JSON format:
     chatContainer.style.cssText = 'max-height: 400px; overflow-y: auto; margin-bottom: 15px; padding: 10px; background: #1a1a1a; border-radius: 4px;';
 
     if (chatHistory.length === 0) {
-      // Initial assistant message
+      // Initial assistant message - different for each step
+      let welcomeMessage = "";
+
+      if (currentStep === 0) {
+        welcomeMessage = `Welcome! I'll help you build the world context for your adventure.
+
+We'll cover: premise & conflict origin, objectives (win/lose conditions), setting & key locations, tone & narrative style, and opposing forces.
+
+Let's start - what kind of adventure world do you have in mind? Share your ideas about the setting, the main story, or any inspirations!`;
+      } else if (currentStep === 1) {
+        welcomeMessage = `Welcome! I'll help you define the rules and mechanics for your game.
+
+We'll cover: combat system, companion mechanics, progression (XP & leveling), inventory, abilities, crafting, social interactions, relationships, and hazards.
+
+I can offer balanced defaults or customize everything to your preference. What's your vision for how the game should play?`;
+      }
+
       chatContainer.innerHTML = `
         <div style="margin-bottom: 15px;">
           <div style="color: #888; font-size: 12px; margin-bottom: 5px;">🤖 World Building Assistant</div>
           <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; color: #e0e0e0; line-height: 1.6;">
-            Welcome! I'll help you build the world context for your adventure.
-
-            We'll cover: premise & conflict origin, objectives (win/lose conditions), setting & key locations, tone & narrative style, and opposing forces.
-
-            Let's start - what kind of adventure world do you have in mind? Share your ideas about the setting, the main story, or any inspirations!
+            ${welcomeMessage}
           </div>
         </div>
       `;
@@ -596,7 +807,7 @@ Respond in JSON format:
     const content = getLivingFileContent();
 
     // For chat-based steps, render with formatting
-    if (currentStep === 0 && wizardData.livingFiles.step0) {
+    if ((currentStep === 0 || currentStep === 1) && wizardData.livingFiles[`step${currentStep}`]) {
       el.fileBody.innerHTML = formatLivingFile(content);
     } else {
       el.fileBody.textContent = content;
