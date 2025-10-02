@@ -484,7 +484,181 @@ Respond in JSON format:
   "livingFile": "Updated NPCs/Factions in format above",
   "coverageComplete": true/false
 }`,
-    step3: `Placeholder for Character Creation guidelines`
+    step3: `You are a World Building Assistant helping create the Player Character for a D&D-style adventure.
+
+IMPORTANT CONTEXT:
+- This uses a HYBRID approach: Player fills basics + point-buy stats, then you help with story/details
+- Player will provide: Name, Gender, Race, Class, Concept, Goal, and base stats (point-buy)
+- Your job: Create backstory, appearance, personality, racial bonuses, abilities, equipment
+- This is a mature game with romance - appearance must be detailed like NPCs
+
+PLAYER INPUT (Pre-filled before chat starts):
+- Name: [Player enters]
+- Gender: [Player selects - affects pronouns in narration]
+- Race: [Player enters - e.g., Human, Elf, Mutant, Cyborg, etc.]
+- Class/Concept: [Player enters - e.g., Rogue, Warrior, Mage, Investigator]
+- Personal Goal: [Player enters - what they want to achieve]
+- Base Stats (Point-Buy): [Player assigns 27 points, range 8-15]
+  * STR, DEX, CON, INT, WIS, CHA
+  * Point costs: 8=0, 9=1, 10=2, 11=3, 12=4, 13=5, 14=7, 15=9
+
+YOUR TASKS (via chat conversation):
+
+1. BACKSTORY & ORIGIN
+   - Ask about their character's history
+   - How did they become their class?
+   - What drives them toward their goal?
+   - Any significant past events?
+   - Write 2-3 paragraphs capturing their story
+
+2. RACIAL STAT BONUSES (Narrative-Based)
+   - Analyze race + story to suggest bonuses
+   - Range: -2 to +4 (total adjustments should be +2 to +4 net)
+   - Examples:
+     * Mutant (post-apocalypse): +3 CON, -1 CHA
+     * Elf (graceful): +2 DEX, +2 WIS
+     * Orc (strong): +3 STR, +1 CON
+   - Ask player: "I suggest [bonuses]. Want different? Or a special playstyle?"
+   - Special playstyles:
+     * "Always succeed CHA checks" → +5 CHA, -2 STR, -2 CON (glass cannon social)
+     * "High risk/reward" → +4 STR, +4 DEX, -3 CON (fragile damage dealer)
+     * "Tank" → +4 CON, +2 STR, -1 DEX (slow but durable)
+
+3. PHYSICAL APPEARANCE (DETAILED - Critical for Romance!)
+   Like NPCs, player character needs vivid description for consistency.
+
+   - Height: Specific (e.g., 6'0", 5'6") or relative
+   - Build & Physique: Be specific
+     * Athletic, muscular, slender, curvy, lean, stocky, etc.
+     * For romance scenes: Describe figure, physical presence
+   - Distinct Features:
+     * Hair: Color, length, style, texture
+     * Eyes: Color, shape, expression
+     * Face: Features, attractiveness, expressions
+     * Body: Muscle definition, curves, skin tone, marks
+     * Scars, tattoos, birthmarks (story significance?)
+   - Clothing Style: How they dress, signature look
+   - Full Description: 3-4 vivid sentences
+     * Complete picture of physical presence
+     * NPCs will see/describe them in romance/intimate scenes
+     * Be detailed and evocative
+
+4. PERSONALITY TRAITS
+   - 3-5 key traits for roleplay guidance
+   - Examples: Brave, cautious, flirtatious, stoic, curious, cunning, compassionate, ruthless
+   - Helps DM narrate character reactions and dialogue
+
+5. STARTING ABILITIES (2-3 class abilities)
+   - Create abilities matching class concept
+   - From Step 1 rules: Usage limits (per rest, per day, passive)
+   - Examples:
+     * Rogue: "Sneak Attack" (once per combat, extra damage)
+     * Mage: "Fireball" (3 uses per rest, area damage)
+     * Warrior: "Second Wind" (passive, heal when below 25% HP)
+   - Balance power level (Level 1 abilities)
+
+6. STARTING EQUIPMENT
+   - Basic gear appropriate to class
+   - 1-2 weapons/tools
+   - Don't list mundane items (assumed)
+   - Examples:
+     * Rogue: Shortsword, lockpicks, dark cloak
+     * Mage: Staff, spellbook, robes
+     * Warrior: Longsword, shield, chainmail
+   - Ask: "Does this equipment suit your character?"
+
+7. STARTING VALUES (from Step 1 Rules)
+   - HP: Base HP by class + CON modifier
+     * Warrior/Tank: 12 + CON mod
+     * Rogue/Ranger: 10 + CON mod
+     * Mage/Scholar: 8 + CON mod
+   - Currency: Starting amount from Step 1 rules (reference rulesAndMechanics living file)
+   - Level: 1
+   - XP: 0
+
+8. STAT SYSTEM EXPLANATION
+   - Stat Cap: 30 (modifier +10) - can become OP late game
+   - Level ups: +1 stat point per level (19 total by Level 20)
+   - Equipment: Up to +8 from legendary items
+   - Companions: +1 to +5 per companion
+   - Natural 1 always fails (5% failure even at cap)
+   - Difficulty scales with level (narrative-based challenges)
+
+YOUR APPROACH:
+- Reference player's filled inputs (name, race, class, goal, base stats)
+- Ask conversational questions to build backstory and appearance
+- Be thorough with physical description (romance game!)
+- Suggest racial bonuses that fit narrative
+- Offer special playstyles if player wants unique build
+- Create balanced starting abilities
+- Update Living Character Sheet as you go
+
+LIVING FILE FORMAT (AI-Optimized):
+
+=== PLAYER CHARACTER ===
+
+Name: [From player input]
+Gender: [From player input - He/She/They]
+Race: [From player input]
+Class: [From player input]
+Personal Goal: [From player input]
+
+Backstory:
+[2-3 paragraphs from conversation]
+
+Base Stats (Point-Buy):
+STR: [Player assigned] → [After racial bonus]
+DEX: [Player assigned] → [After racial bonus]
+CON: [Player assigned] → [After racial bonus]
+INT: [Player assigned] → [After racial bonus]
+WIS: [Player assigned] → [After racial bonus]
+CHA: [Player assigned] → [After racial bonus]
+
+Racial Bonuses: [List bonuses and justification]
+Special Playstyle: [If applicable - e.g., "Social specialist - always succeed CHA"]
+
+Physical Appearance:
+Height: [Specific/relative]
+Build: [Body type - specific about physique]
+Hair: [Color, length, style, texture]
+Eyes: [Color, shape, expression]
+Face: [Features, attractiveness]
+Body: [Figure, muscle, skin tone, distinctive marks]
+Clothing Style: [How they dress]
+Full Description: [3-4 vivid sentences - detailed physical presence for romance consistency]
+
+Personality Traits: [Trait 1, Trait 2, Trait 3, Trait 4, Trait 5]
+
+Starting Values:
+Level: 1
+XP: 0 / 100
+HP: [Base + CON mod] / [Max]
+Currency: [From Step 1 rules]
+
+Starting Abilities:
+1. [Ability Name]: [Description, usage limit]
+2. [Ability Name]: [Description, usage limit]
+3. [Ability Name]: [Description, usage limit]
+
+Starting Equipment:
+- [Weapon/tool 1]
+- [Weapon/tool 2]
+- [Armor/clothing]
+
+Stat System Notes:
+- Stat cap: 30 (+10 modifier)
+- Level ups: +1 point per level (19 total)
+- Equipment/Companions: Additional bonuses
+- Natural 1 always fails
+
+When character is complete, say: "Your character looks amazing! Ready to begin the adventure? Click Next when ready."
+
+Respond in JSON format:
+{
+  "message": "Your conversational response",
+  "livingFile": "Updated character sheet in format above",
+  "coverageComplete": true/false
+}`
   };
 
   // Load guidelines from localStorage or use defaults
@@ -629,24 +803,14 @@ Respond in JSON format:
       case 2:
         return {
           convoTitle: "NPCs & Factions",
-          convoBody:
-            "List a few key NPCs (ally/rival/romance) and at least one faction with a goal.",
-          fields: [
-            { key: "npcs", label: "Key NPCs", placeholder: "e.g., Elara (ally, scholar)" },
-            { key: "factions", label: "Factions", placeholder: "e.g., The Shadow Court" },
-            { key: "conflicts", label: "Conflicts", placeholder: "e.g., War between realms" }
-          ]
+          useChatUI: true,
+          initialPlaceholder: "Let's create the NPCs and factions for your world! Tell me about key characters, their roles, or any ideas you have..."
         };
       case 3:
         return {
           convoTitle: "Character Creation",
-          convoBody:
-            "Pick your character concept and 6 stats. We'll balance with AI later.",
-          fields: [
-            { key: "characterName", label: "Name", placeholder: "e.g., Kael" },
-            { key: "characterConcept", label: "Class/Concept", placeholder: "e.g., Rogue investigator" },
-            { key: "stats", label: "Stats (STR/DEX/CON/INT/WIS/CHA)", placeholder: "e.g., 10/16/12/14/13/15" }
-          ]
+          useHybridUI: true,  // Special hybrid mode
+          initialPlaceholder: "Great! Now I'll help you build your character's backstory, appearance, and abilities based on your choices..."
         };
       default:
         return { convoTitle: "Conversation", convoBody: "", fields: [] };
@@ -662,9 +826,18 @@ Respond in JSON format:
         // Use AI-generated living file for Step 1
         return wizardData.livingFiles.step1 || "(Chat with the World Building Assistant to define your game rules and mechanics...)";
       case 2:
-        return `- Key NPCs: ${wizardData.npcs || "(empty)"}\n- Factions: ${wizardData.factions || "(empty)"}\n- Conflicts: ${wizardData.conflicts || "(empty)"}`;
+        // Use AI-generated living file for Step 2
+        return wizardData.livingFiles.step2 || "(Chat with the World Building Assistant to create NPCs and factions...)";
       case 3:
-        return `- Name: ${wizardData.characterName || "(empty)"}\n- Class/Concept: ${wizardData.characterConcept || "(empty)"}\n- Stats (STR/DEX/CON/INT/WIS/CHA): ${wizardData.stats || "(empty)"}`;
+        // Use AI-generated living file for Step 3, or show basic info if not started chat yet
+        if (wizardData.livingFiles.step3) {
+          return wizardData.livingFiles.step3;
+        } else if (wizardData.characterName && wizardData.pointBuyStats) {
+          const stats = wizardData.pointBuyStats;
+          return `=== PLAYER CHARACTER (In Progress) ===\n\nName: ${wizardData.characterName}\nGender: ${wizardData.characterGender}\nRace: ${wizardData.characterRace}\nClass: ${wizardData.characterClass}\nGoal: ${wizardData.characterGoal}\n\nBase Stats:\nSTR: ${stats.STR}, DEX: ${stats.DEX}, CON: ${stats.CON}\nINT: ${stats.INT}, WIS: ${stats.WIS}, CHA: ${stats.CHA}\n\nClick "Generate Character Story & Details" to continue...`;
+        } else {
+          return "(Fill out character details and assign stats to begin...)";
+        }
       default:
         return "";
     }
@@ -675,17 +848,20 @@ Respond in JSON format:
     el.convoTitle.textContent = c.convoTitle;
 
     // Show/hide guideline button for chat-based steps
-    if (c.useChatUI) {
+    if (c.useChatUI || c.useHybridUI) {
       el.guidelineBtn.style.display = 'block';
     } else {
       el.guidelineBtn.style.display = 'none';
     }
 
     if (c.useChatUI) {
-      // Chat-based UI (for Step 0)
+      // Chat-based UI (for Steps 0-2)
       renderChatUI(c);
+    } else if (c.useHybridUI) {
+      // Hybrid UI (for Step 3)
+      renderHybridUI(c);
     } else {
-      // Field-based UI (for Steps 1-3)
+      // Field-based UI (legacy - not used anymore)
       el.convoBody.textContent = c.convoBody;
 
       // Render input fields
@@ -747,6 +923,12 @@ Let's start - what kind of adventure world do you have in mind? Share your ideas
 We'll cover: combat system, companion mechanics, progression (XP & leveling), inventory, abilities, crafting, social interactions, relationships, and hazards.
 
 I can offer balanced defaults or customize everything to your preference. What's your vision for how the game should play?`;
+      } else if (currentStep === 2) {
+        welcomeMessage = `Welcome! I'll help you create the NPCs and factions for your world.
+
+We'll cover: key NPCs with detailed appearances (important for romance!), personality, relationship points, companion bonuses, and factions with their goals and conflicts.
+
+Remember: This is a mature game with romance. Physical descriptions should be vivid and detailed. Let's start - how many key NPCs do you want to create?`;
       }
 
       chatContainer.innerHTML = `
@@ -867,6 +1049,317 @@ I can offer balanced defaults or customize everything to your preference. What's
         handleSend();
       }
     });
+  }
+
+  function renderHybridUI(config) {
+    const stepKey = `step${currentStep}`;
+
+    // Check if character data is filled
+    const isDataFilled = wizardData.characterName && wizardData.characterGender &&
+                         wizardData.characterRace && wizardData.characterClass &&
+                         wizardData.pointBuyStats;
+
+    if (!isDataFilled) {
+      // Show input form for basic character data
+      el.convoBody.innerHTML = `
+        <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+          <p style="color: #888; margin-bottom: 15px;">Fill out your character's basic information and assign stats using the point-buy system (27 points total).</p>
+        </div>
+      `;
+
+      el.inputArea.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+          <div>
+            <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Name *</label>
+            <input type="text" id="charName" value="${wizardData.characterName || ''}"
+                   placeholder="e.g., Kael Shadowbane"
+                   style="width: 100%; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px;">
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Gender *</label>
+            <select id="charGender" style="width: 100%; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px;">
+              <option value="">Select...</option>
+              <option value="Male" ${wizardData.characterGender === 'Male' ? 'selected' : ''}>Male (He/Him)</option>
+              <option value="Female" ${wizardData.characterGender === 'Female' ? 'selected' : ''}>Female (She/Her)</option>
+              <option value="Non-binary" ${wizardData.characterGender === 'Non-binary' ? 'selected' : ''}>Non-binary (They/Them)</option>
+              <option value="Other" ${wizardData.characterGender === 'Other' ? 'selected' : ''}>Other</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Race *</label>
+            <input type="text" id="charRace" value="${wizardData.characterRace || ''}"
+                   placeholder="e.g., Human, Elf, Mutant, Cyborg"
+                   style="width: 100%; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px;">
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Class/Concept *</label>
+            <input type="text" id="charClass" value="${wizardData.characterClass || ''}"
+                   placeholder="e.g., Rogue, Warrior, Mage"
+                   style="width: 100%; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px;">
+          </div>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Personal Goal *</label>
+          <textarea id="charGoal" placeholder="What does your character want to achieve?"
+                    style="width: 100%; min-height: 60px; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px; resize: vertical;">${wizardData.characterGoal || ''}</textarea>
+        </div>
+
+        <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+          <h3 style="margin: 0 0 15px 0; color: #d97706;">Point-Buy Stats (27 points)</h3>
+          <p style="color: #888; font-size: 13px; margin-bottom: 15px;">Assign your base stats (range 8-15). Costs: 8=0pts, 9=1pt, 10=2pts, 11=3pts, 12=4pts, 13=5pts, 14=7pts, 15=9pts</p>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;" id="statGrid">
+            ${['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].map(stat => {
+              const val = wizardData.pointBuyStats?.[stat] || 8;
+              return `
+                <div style="background: #2a2a2a; padding: 10px; border-radius: 4px;">
+                  <div style="font-weight: bold; color: #d97706; margin-bottom: 5px;">${stat}</div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <button class="stat-btn" data-stat="${stat}" data-dir="-1" style="width: 30px; height: 30px; background: #444; color: #e0e0e0; border: none; border-radius: 4px; cursor: pointer; font-size: 18px;">−</button>
+                    <div style="flex: 1; text-align: center; font-size: 20px; font-weight: bold; color: #e0e0e0;" id="stat-${stat}">${val}</div>
+                    <button class="stat-btn" data-stat="${stat}" data-dir="1" style="width: 30px; height: 30px; background: #444; color: #e0e0e0; border: none; border-radius: 4px; cursor: pointer; font-size: 18px;">+</button>
+                  </div>
+                  <div style="text-align: center; font-size: 12px; color: #888; margin-top: 5px;" id="cost-${stat}">Cost: 0</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div style="margin-top: 15px; padding: 10px; background: #333; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #e0e0e0;">Points Remaining:</span>
+            <span id="pointsRemaining" style="font-size: 20px; font-weight: bold; color: #d97706;">27</span>
+          </div>
+        </div>
+
+        <button id="generateBtn" style="width: 100%; padding: 12px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px;">
+          🤖 Generate Character Story & Details
+        </button>
+      `;
+
+      // Initialize point-buy stats if not exists
+      if (!wizardData.pointBuyStats) {
+        wizardData.pointBuyStats = { STR: 8, DEX: 8, CON: 8, INT: 8, WIS: 8, CHA: 8 };
+      }
+
+      // Point-buy cost calculation
+      const getStatCost = (val) => {
+        const costs = { 8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9 };
+        return costs[val] || 0;
+      };
+
+      const calculateTotalCost = () => {
+        return Object.values(wizardData.pointBuyStats).reduce((sum, val) => sum + getStatCost(val), 0);
+      };
+
+      const updatePointDisplay = () => {
+        const total = calculateTotalCost();
+        const remaining = 27 - total;
+        document.getElementById('pointsRemaining').textContent = remaining;
+        document.getElementById('pointsRemaining').style.color = remaining < 0 ? '#ff4444' : '#d97706';
+
+        // Update cost displays
+        ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].forEach(stat => {
+          const cost = getStatCost(wizardData.pointBuyStats[stat]);
+          document.getElementById(`cost-${stat}`).textContent = `Cost: ${cost}`;
+        });
+      };
+
+      // Stat button handlers
+      el.inputArea.querySelectorAll('.stat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const stat = btn.getAttribute('data-stat');
+          const dir = parseInt(btn.getAttribute('data-dir'));
+          const current = wizardData.pointBuyStats[stat];
+          const newVal = current + dir;
+
+          if (newVal >= 8 && newVal <= 15) {
+            const newCost = calculateTotalCost() - getStatCost(current) + getStatCost(newVal);
+            if (newCost <= 27) {
+              wizardData.pointBuyStats[stat] = newVal;
+              document.getElementById(`stat-${stat}`).textContent = newVal;
+              updatePointDisplay();
+            }
+          }
+        });
+      });
+
+      // Generate button
+      document.getElementById('generateBtn').addEventListener('click', () => {
+        const name = document.getElementById('charName').value.trim();
+        const gender = document.getElementById('charGender').value;
+        const race = document.getElementById('charRace').value.trim();
+        const charClass = document.getElementById('charClass').value.trim();
+        const goal = document.getElementById('charGoal').value.trim();
+
+        if (!name || !gender || !race || !charClass || !goal) {
+          alert('Please fill out all fields before generating character details.');
+          return;
+        }
+
+        const totalCost = calculateTotalCost();
+        if (totalCost !== 27) {
+          alert(`You must use exactly 27 points. Currently using ${totalCost} points.`);
+          return;
+        }
+
+        // Save to wizard data
+        wizardData.characterName = name;
+        wizardData.characterGender = gender;
+        wizardData.characterRace = race;
+        wizardData.characterClass = charClass;
+        wizardData.characterGoal = goal;
+
+        // Re-render to show chat UI
+        renderHybridUI(config);
+      });
+
+      updatePointDisplay();
+
+    } else {
+      // Show chat UI with context
+      const chatHistory = wizardData.chatHistory[stepKey];
+
+      // Render chat container
+      const chatContainer = document.createElement('div');
+      chatContainer.style.cssText = 'max-height: 400px; overflow-y: auto; margin-bottom: 15px; padding: 10px; background: #1a1a1a; border-radius: 4px;';
+
+      if (chatHistory.length === 0) {
+        // Initial message with character summary
+        const stats = wizardData.pointBuyStats;
+        const statSummary = `STR ${stats.STR}, DEX ${stats.DEX}, CON ${stats.CON}, INT ${stats.INT}, WIS ${stats.WIS}, CHA ${stats.CHA}`;
+
+        chatContainer.innerHTML = `
+          <div style="margin-bottom: 15px;">
+            <div style="color: #888; font-size: 12px; margin-bottom: 5px;">🤖 World Building Assistant</div>
+            <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; color: #e0e0e0; line-height: 1.6;">
+              Perfect! I see you've created:
+
+              <strong>${wizardData.characterName}</strong> (${wizardData.characterGender})
+              ${wizardData.characterRace} ${wizardData.characterClass}
+              Goal: ${wizardData.characterGoal}
+              Base Stats: ${statSummary}
+
+              Now let's build the rest! I'll help you create:
+              - Backstory and origin
+              - Racial stat bonuses (narrative-based)
+              - Detailed physical appearance (important for romance!)
+              - Personality traits
+              - Starting abilities
+              - Starting equipment
+
+              Let's start with your backstory. Tell me about ${wizardData.characterName}'s history - how did they become a ${wizardData.characterClass}? What drives them?
+            </div>
+          </div>
+        `;
+      } else {
+        // Render existing chat
+        chatHistory.forEach(msg => {
+          const isUser = msg.role === 'user';
+          const msgDiv = document.createElement('div');
+          msgDiv.style.marginBottom = '15px';
+
+          const labelDiv = document.createElement('div');
+          labelDiv.style.cssText = 'color: #888; font-size: 12px; margin-bottom: 5px;';
+          labelDiv.textContent = isUser ? '👤 You' : '🤖 World Building Assistant';
+
+          const contentDiv = document.createElement('div');
+          contentDiv.style.cssText = `background: ${isUser ? '#1e3a5f' : '#2a2a2a'}; padding: 10px; border-radius: 4px; color: #e0e0e0; white-space: pre-wrap; line-height: 1.6;`;
+          contentDiv.textContent = msg.content;
+
+          msgDiv.appendChild(labelDiv);
+          msgDiv.appendChild(contentDiv);
+          chatContainer.appendChild(msgDiv);
+        });
+
+        setTimeout(() => chatContainer.scrollTop = chatContainer.scrollHeight, 0);
+      }
+
+      el.convoBody.innerHTML = '';
+      el.convoBody.appendChild(chatContainer);
+
+      // Render input area
+      el.inputArea.innerHTML = `
+        <div style="display: flex; gap: 10px;">
+          <textarea
+            id="chatInput"
+            placeholder="${config.initialPlaceholder}"
+            style="flex: 1; padding: 10px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px; resize: vertical; min-height: 80px; font-family: inherit;"
+          ></textarea>
+          <button id="sendBtn" style="padding: 10px 20px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Send</button>
+        </div>
+        <div id="loadingIndicator" style="margin-top: 10px; color: #888; font-size: 14px; display: none;">
+          <span>🤖 Assistant is thinking</span>
+          <span class="dots" style="display: inline-block; width: 20px; text-align: left;">...</span>
+        </div>
+      `;
+
+      const chatInput = el.inputArea.querySelector('#chatInput');
+      const sendBtn = el.inputArea.querySelector('#sendBtn');
+      const loadingIndicator = el.inputArea.querySelector('#loadingIndicator');
+
+      async function handleSend() {
+        const userMessage = chatInput.value.trim();
+        if (!userMessage) return;
+
+        chatInput.value = '';
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+
+        wizardData.chatHistory[stepKey].push({ role: 'user', content: userMessage });
+        localStorage.setItem(`wizard_chat_${stepKey}`, JSON.stringify(wizardData.chatHistory[stepKey]));
+
+        renderHybridUI(config);
+
+        const newLoadingIndicator = el.inputArea.querySelector('#loadingIndicator');
+        if (newLoadingIndicator) {
+          newLoadingIndicator.style.display = 'block';
+        }
+
+        try {
+          // Build context with character data
+          const stats = wizardData.pointBuyStats;
+          const statString = `STR ${stats.STR}, DEX ${stats.DEX}, CON ${stats.CON}, INT ${stats.INT}, WIS ${stats.WIS}, CHA ${stats.CHA}`;
+          const characterContext = `
+PLAYER CHARACTER INPUT:
+Name: ${wizardData.characterName}
+Gender: ${wizardData.characterGender}
+Race: ${wizardData.characterRace}
+Class: ${wizardData.characterClass}
+Personal Goal: ${wizardData.characterGoal}
+Base Stats (Point-Buy): ${statString}
+
+Reference the world context from previous steps as needed.`;
+
+          const response = await callWorldBuildingAssistant(stepKey, characterContext + '\n\n' + userMessage);
+
+          wizardData.chatHistory[stepKey].push({ role: 'assistant', content: response.message });
+
+          if (response.livingFile) {
+            wizardData.livingFiles[stepKey] = response.livingFile;
+            localStorage.setItem(`wizard_livingFile_${stepKey}`, response.livingFile);
+          }
+
+          localStorage.setItem(`wizard_chat_${stepKey}`, JSON.stringify(wizardData.chatHistory[stepKey]));
+
+          updateLivingFile();
+          renderHybridUI(config);
+
+        } catch (error) {
+          alert(`Error: ${error.message}`);
+          wizardData.chatHistory[stepKey].pop();
+          localStorage.setItem(`wizard_chat_${stepKey}`, JSON.stringify(wizardData.chatHistory[stepKey]));
+          renderHybridUI(config);
+        }
+      }
+
+      sendBtn.addEventListener('click', handleSend);
+      chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          handleSend();
+        }
+      });
+    }
   }
 
   async function callWorldBuildingAssistant(stepKey, userMessage) {
@@ -1012,7 +1505,7 @@ I can offer balanced defaults or customize everything to your preference. What's
     const content = getLivingFileContent();
 
     // For chat-based steps, render with formatting
-    if ((currentStep === 0 || currentStep === 1) && wizardData.livingFiles[`step${currentStep}`]) {
+    if ((currentStep === 0 || currentStep === 1 || currentStep === 2 || currentStep === 3) && wizardData.livingFiles[`step${currentStep}`]) {
       el.fileBody.innerHTML = formatLivingFile(content);
     } else {
       el.fileBody.textContent = content;
