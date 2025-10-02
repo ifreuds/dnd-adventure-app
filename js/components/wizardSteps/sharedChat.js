@@ -24,17 +24,12 @@ export function renderHybridChat(currentStep, stepKey, config, wizardData, guide
   chatContainer.style.cssText = 'max-height: 400px; overflow-y: auto; margin-bottom: 15px; padding: 10px; background: #1a1a1a; border-radius: 4px;';
 
   if (chatHistory.length === 0) {
-    // Initial message - get from step module
-    const initialMessage = stepModule.getStep0InitialMessage ? stepModule.getStep0InitialMessage(wizardData) :
-                           stepModule.getStep1InitialMessage ? stepModule.getStep1InitialMessage(wizardData) :
-                           stepModule.getStep2InitialMessage ? stepModule.getStep2InitialMessage(wizardData) :
-                           stepModule.getStep3InitialMessage ? stepModule.getStep3InitialMessage(wizardData) : '';
-
+    // Show loading - we'll auto-generate the first response
     chatContainer.innerHTML = `
       <div style="margin-bottom: 15px;">
         <div style="color: #888; font-size: 12px; margin-bottom: 5px;">🤖 World Building Assistant</div>
         <div style="background: #2a2a2a; padding: 10px; border-radius: 4px; color: #e0e0e0; line-height: 1.6;">
-          ${initialMessage}
+          Generating your world draft...
         </div>
       </div>
     `;
@@ -142,4 +137,41 @@ export function renderHybridChat(currentStep, stepKey, config, wizardData, guide
       handleSend();
     }
   });
+
+  // Auto-generate first response if chat is empty
+  if (chatHistory.length === 0) {
+    // Build initial context message
+    let initialPrompt = "Please create a draft Living File based on the inputs I provided. Fill in what you can infer, and mark incomplete areas as '[To be defined]'. Then ask me ONE specific question about what to expand on first.";
+
+    if (stepModule.buildStep0Context) {
+      initialPrompt = stepModule.buildStep0Context(wizardData, initialPrompt);
+    } else if (stepModule.buildStep1Context) {
+      initialPrompt = stepModule.buildStep1Context(wizardData, initialPrompt);
+    } else if (stepModule.buildStep2Context) {
+      initialPrompt = stepModule.buildStep2Context(wizardData, initialPrompt);
+    } else if (stepModule.buildStep3Context) {
+      initialPrompt = stepModule.buildStep3Context(wizardData, initialPrompt);
+    }
+
+    // Trigger auto-generation
+    (async () => {
+      try {
+        const response = await callWorldBuildingAssistant(stepKey, initialPrompt, wizardData, guidelines);
+
+        wizardData.chatHistory[stepKey].push({ role: 'assistant', content: response.message });
+
+        if (response.livingFile) {
+          wizardData.livingFiles[stepKey] = response.livingFile;
+          localStorage.setItem(`wizard_livingFile_${stepKey}`, response.livingFile);
+        }
+
+        localStorage.setItem(`wizard_chat_${stepKey}`, JSON.stringify(wizardData.chatHistory[stepKey]));
+
+        onUpdate();
+      } catch (error) {
+        alert(`Error generating initial draft: ${error.message}`);
+        onUpdate();
+      }
+    })();
+  }
 }
