@@ -69,7 +69,7 @@ export function renderStep0Form(wizardData, el, onComplete) {
 
 export function getStep0InitialMessage(wizardData) {
   // This creates the FIRST auto-generated prompt sent to AI
-  // AI will respond with draft Living File + ONE question
+  // AI will respond with COMPLETE draft Living File covering all 6 areas
   return `I've filled out the basic world information:
 
 World Name: ${wizardData.worldName}
@@ -77,20 +77,15 @@ Genre/Theme: ${wizardData.worldGenre}
 Main Conflict: ${wizardData.worldConflict}
 Narrative Style: ${wizardData.narrativeStyle}
 
-Please create a draft Living File in the proper format, filling in what you can infer from these inputs. Mark any incomplete areas as "[To be defined]".
+Please create a COMPLETE Living File covering all 6 required areas (Premise & Origin, Main Objective, World Setting, Key Locations, Tone & Narrative Style, Key Conflicts & Factions). Fill everything with creative content based on my inputs - do NOT leave any "[To be defined]" placeholders.
 
-Then ask me ONE specific question about what to expand on first.`;
+Make intelligent inferences to create a cohesive world. Then ask me to review it and let you know if I want to change anything.`;
 }
 
 export function buildStep0Context(wizardData, userMessage) {
-  const worldContext = `
-WORLD INPUT:
-World Name: ${wizardData.worldName}
-Genre/Theme: ${wizardData.worldGenre}
-Main Conflict: ${wizardData.worldConflict}
-Narrative Style: ${wizardData.narrativeStyle}`;
-
-  return worldContext + '\n\n' + userMessage;
+  // User inputs are already passed in aiAssistant.js system prompt
+  // Just return the user message as-is to avoid redundancy
+  return userMessage;
 }
 
 export function isStep0Complete(wizardData) {
