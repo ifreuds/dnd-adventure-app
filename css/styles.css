@@ -289,6 +289,43 @@ button:hover {
   color: #a9a9a9;
 }
 
+/* DM Thinking Animation */
+.dm-thinking {
+  padding: 20px;
+  text-align: center;
+  color: #a9a9a9;
+  font-style: italic;
+}
+
+.dm-thinking::after {
+  content: '';
+  animation: dmThinking 1.5s infinite;
+}
+
+@keyframes dmThinking {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+  100% { content: '.'; }
+}
+
+/* Alternative spinner loader */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #333;
+  border-top-color: #4CAF50;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Gallery Modal */
 .gallery-grid {
   display: grid;

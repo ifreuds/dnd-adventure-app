@@ -98,11 +98,24 @@ The wizard uses a **two-panel collaborative design**:
     - ✅ Set high token limit (2000+) to account for reasoning tokens
     - ✅ Parse JSON from response (handles both raw JSON and markdown code blocks)
 
+### ✅ Backend Integration - Mature Mode (Grok API)
+- **Grok API integration** - ✅ Working!
+  - Model: `grok-4-fast-reasoning`
+  - Endpoint: `https://api.x.ai/v1/chat/completions`
+  - API key stored in localStorage (user enters via Settings modal)
+  - Supports JSON mode: `response_format: { type: "json_object" }`
+  - Temperature: 0.8 for creative mature content
+  - **Mode Toggle**: Click "Mode: Normal" button to switch to "Mode: Mature 🔞"
+  - **Visual indicators**:
+    - DM badge shows which AI is responding ("🎲 GPT DM" or "🔞 Grok DM")
+    - Loading indicator shows which DM is thinking (with spinner animation)
+  - **Console logging**: Check browser console to verify which API is called
+  - **Seamless switching**: Can toggle modes mid-game, all context flows to active DM
+
 ### ❌ Backend Integration - Not Yet Connected
 - **Supabase** - Placeholder save/load (js/services/supabase.js exists but empty)
 - **Image Generation API** - Using placeholder images (js/services/imageService.js exists but empty)
 - **Autosave System** - Not yet implemented (every turn + checkpoint saves)
-- **Romance Mode AI** - Shows warning, not implemented
 
 ## UI Features
 
@@ -139,9 +152,11 @@ All modals use overlay pattern (no full page replacement):
 ### API Call Flow
 1. User takes action → `handlePlayerAction()` in gameUI.js
 2. Build context object (world theme, character, scene log)
-3. Call `generateNarration(context)` from gpt.js
-4. GPT returns JSON with narration, choices, dice requirements
-5. Update UI with narration and new choices
+3. Route to appropriate API based on mode:
+   - **Normal Mode** → `generateGptNarration(context)` from gpt.js (GPT-5-mini)
+   - **Mature Mode** → `generateGrokNarration(context)` from grok.js (Grok-4-Fast)
+4. AI returns JSON with narration, choices, dice requirements
+5. Update UI with narration (shows DM badge: "🎲 GPT DM" or "🔞 Grok DM")
 6. Add turn to scene log (max 10 turns)
 
 ### Scene Log Format

@@ -137,10 +137,31 @@ export function renderGameUI(container, worldData = {}) {
   renderChoices(placeholderChoices);
 
   // Functions
-  function addNarration(text) {
+  function addNarration(text, showDmBadge = false) {
     const messageDiv = document.createElement("div");
     messageDiv.className = "narration-message";
-    messageDiv.textContent = text;
+
+    // Add DM badge if requested
+    if (showDmBadge) {
+      const badge = document.createElement("span");
+      badge.className = "dm-badge";
+      badge.textContent = isMatureMode ? "🔞 Grok DM" : "🎲 GPT DM";
+      badge.style.cssText = `
+        display: inline-block;
+        padding: 2px 8px;
+        margin-bottom: 8px;
+        font-size: 0.75em;
+        font-weight: bold;
+        border-radius: 4px;
+        background: ${isMatureMode ? '#8B0000' : '#1a4d1a'};
+        color: #fff;
+      `;
+      messageDiv.appendChild(badge);
+      messageDiv.appendChild(document.createElement("br"));
+    }
+
+    const textNode = document.createTextNode(text);
+    messageDiv.appendChild(textNode);
     el.chatMessages.appendChild(messageDiv);
     el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
   }
@@ -170,8 +191,9 @@ export function renderGameUI(container, worldData = {}) {
     // Clear input
     el.freeTextInput.value = "";
 
-    // Disable choices while processing
-    el.choiceButtons.innerHTML = '<div class="image-loading">The DM is thinking...</div>';
+    // Disable choices while processing - show animated loading
+    const dmName = isMatureMode ? "Grok" : "GPT";
+    el.choiceButtons.innerHTML = `<div class="dm-thinking">🎲 ${dmName} DM is thinking<span class="spinner"></span></div>`;
     el.freeTextInput.disabled = true;
     el.submitActionBtn.disabled = true;
 
@@ -191,9 +213,11 @@ export function renderGameUI(container, worldData = {}) {
       };
 
       // Route to appropriate API based on mode
+      console.log(`🎲 Calling ${isMatureMode ? 'Grok-4-Fast (Mature Mode)' : 'GPT-5-mini (Normal Mode)'} API...`);
       const result = isMatureMode
         ? await generateGrokNarration(context)
         : await generateGptNarration(context);
+      console.log(`✅ ${isMatureMode ? 'Grok' : 'GPT'} response received:`, result);
 
       // Add to scene log
       sceneLog.push({
@@ -207,8 +231,8 @@ export function renderGameUI(container, worldData = {}) {
         sceneLog.shift();
       }
 
-      // Display narration
-      addNarration(result.narration);
+      // Display narration with DM badge
+      addNarration(result.narration, true);
 
       // Handle dice roll if required
       if (result.diceRequired) {
@@ -320,11 +344,13 @@ export function renderGameUI(container, worldData = {}) {
             };
 
             // Route to appropriate API based on mode
+            console.log(`🎲 Calling ${isMatureMode ? 'Grok-4-Fast (Mature Mode)' : 'GPT-5-mini (Normal Mode)'} API for dice outcome...`);
             const result = isMatureMode
               ? await generateGrokNarration(context)
               : await generateGptNarration(context);
+            console.log(`✅ ${isMatureMode ? 'Grok' : 'GPT'} dice outcome received:`, result);
 
-            addNarration(result.narration);
+            addNarration(result.narration, true);
             renderChoices(result.choices);
 
             // Add outcome to scene log
