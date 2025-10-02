@@ -1,4 +1,4 @@
-export function renderWorldWizard(container) {
+export function renderWorldWizard(container, existingWorldData = null) {
   const steps = [
     { id: 0, title: "Theme & Tone" },
     { id: 1, title: "Rules & Mechanics" },
@@ -83,8 +83,29 @@ Respond in JSON format:
       step1: [],
       step2: [],
       step3: []
-    }
+    },
+
+    // Store existing world ID if editing
+    worldId: null
   };
+
+  // If editing existing world, restore data
+  if (existingWorldData) {
+    wizardData.worldId = existingWorldData.id;
+    wizardData.livingFiles.step0 = existingWorldData.themeAndTone || "";
+    wizardData.livingFiles.step1 = existingWorldData.rulesAndMechanics || "";
+    wizardData.livingFiles.step2 = existingWorldData.npcsAndFactions || "";
+    wizardData.livingFiles.step3 = existingWorldData.character || "";
+    wizardData.characterName = existingWorldData.characterName || "";
+    wizardData.characterConcept = existingWorldData.characterConcept || "";
+    wizardData.stats = existingWorldData.stats || "";
+
+    // Update localStorage with restored data
+    localStorage.setItem('wizard_livingFile_step0', wizardData.livingFiles.step0);
+    localStorage.setItem('wizard_livingFile_step1', wizardData.livingFiles.step1);
+    localStorage.setItem('wizard_livingFile_step2', wizardData.livingFiles.step2);
+    localStorage.setItem('wizard_livingFile_step3', wizardData.livingFiles.step3);
+  }
 
   container.innerHTML = `
     <div class="wizard">
@@ -593,19 +614,83 @@ Respond in JSON format:
       currentStep++;
       render();
     } else {
-      // Finish: Navigate to Main Game UI with wizard data
-      console.log("Finishing wizard with data:", wizardData);
-      import("./gameUI.js")
-        .then(({ renderGameUI }) => {
-          console.log("Loaded gameUI.js successfully");
-          renderGameUI(container, wizardData);
-        })
-        .catch(err => {
-          console.error("Failed to load gameUI.js:", err);
-          alert("Error loading game UI. Check console for details.");
-        });
+      // Finish: Save world and navigate to Main Game UI
+      saveWorld();
     }
   });
+
+  function saveWorld() {
+    // Use existing world ID if editing, otherwise create new
+    const isEditing = !!wizardData.worldId;
+    const worldId = wizardData.worldId || `world_${Date.now()}`;
+
+    // Load existing world data if editing
+    let existingData = {};
+    if (isEditing) {
+      existingData = JSON.parse(localStorage.getItem(worldId) || '{}');
+    }
+
+    // Compile complete world data
+    const worldData = {
+      id: worldId,
+      worldName: extractWorldName(), // Extract from living file or default
+      playerLevel: existingData.playerLevel || 1, // Preserve level if editing
+      turnCount: existingData.turnCount || 0, // Preserve turn count if editing
+      createdAt: existingData.createdAt || new Date().toISOString(),
+      lastPlayed: new Date().toISOString(),
+
+      // Living Files (all world building data)
+      themeAndTone: wizardData.livingFiles.step0 || "",
+      rulesAndMechanics: wizardData.livingFiles.step1 || wizardData.specialRules || "",
+      npcsAndFactions: wizardData.livingFiles.step2 || `NPCs: ${wizardData.npcs}\nFactions: ${wizardData.factions}\nConflicts: ${wizardData.conflicts}`,
+      character: wizardData.livingFiles.step3 || `Name: ${wizardData.characterName}\nClass: ${wizardData.characterConcept}\nStats: ${wizardData.stats}`,
+
+      // Legacy fields for backward compatibility
+      characterName: wizardData.characterName || "Adventurer",
+      characterConcept: wizardData.characterConcept || "Hero",
+      stats: wizardData.stats || "10/10/10/10/10/10",
+
+      // Preserve scene log if editing
+      sceneLog: existingData.sceneLog || []
+    };
+
+    // Save to localStorage
+    localStorage.setItem(worldId, JSON.stringify(worldData));
+
+    // Add to saved worlds list (only if new)
+    if (!isEditing) {
+      const savedWorldsList = JSON.parse(localStorage.getItem('saved_worlds_list') || '[]');
+      savedWorldsList.push(worldId);
+      localStorage.setItem('saved_worlds_list', JSON.stringify(savedWorldsList));
+    }
+
+    console.log(isEditing ? "World updated:" : "World saved:", worldData);
+
+    // Navigate to game UI
+    import("./gameUI.js")
+      .then(({ renderGameUI }) => {
+        renderGameUI(container, worldData);
+      })
+      .catch(err => {
+        console.error("Failed to load gameUI.js:", err);
+        alert("Error loading game UI. Check console for details.");
+      });
+  }
+
+  function extractWorldName() {
+    // Try to extract world name from Theme & Tone living file
+    const themeContent = wizardData.livingFiles.step0;
+    if (themeContent) {
+      const nameMatch = themeContent.match(/(?:World Name|Name|Title):\s*([^\n]+)/i);
+      if (nameMatch) return nameMatch[1].trim();
+
+      const themeMatch = themeContent.match(/Theme:\s*([^\n]+)/i);
+      if (themeMatch) return themeMatch[1].trim().substring(0, 30); // First 30 chars of theme
+    }
+
+    // Fallback to character name
+    return wizardData.characterName ? `${wizardData.characterName}'s Adventure` : "Untitled World";
+  }
 
   el.guidelineBtn.addEventListener("click", () => {
     showGuidelineEditor();

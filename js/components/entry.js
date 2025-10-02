@@ -40,23 +40,12 @@ export function renderEntry(container) {
     const modal = document.createElement("div");
     modal.className = "modal-overlay";
 
-    // Placeholder saved worlds (will fetch from Supabase later)
-    const savedWorlds = [
-      {
-        id: 1,
-        name: "Dark Forest Adventure",
-        characterName: "Kael",
-        lastPlayed: "2025-10-01T10:30:00",
-        turnCount: 15
-      },
-      {
-        id: 2,
-        name: "Cosmic Horror Quest",
-        characterName: "Elara",
-        lastPlayed: "2025-09-28T14:20:00",
-        turnCount: 42
-      }
-    ];
+    // Load saved worlds from localStorage
+    const savedWorldsIds = JSON.parse(localStorage.getItem('saved_worlds_list') || '[]');
+    const savedWorlds = savedWorldsIds.map(id => {
+      const worldData = JSON.parse(localStorage.getItem(id) || '{}');
+      return worldData;
+    }).filter(w => w.id); // Filter out any invalid entries
 
     modal.innerHTML = `
       <div class="modal-content">
@@ -72,9 +61,9 @@ export function renderEntry(container) {
                   ${savedWorlds.map(world => `
                     <div class="world-item" data-id="${world.id}">
                       <div style="flex: 1;">
-                        <h3 style="margin: 0 0 8px 0; font-size: 1.1em;">${world.name}</h3>
+                        <h3 style="margin: 0 0 8px 0; font-size: 1.1em;">${world.worldName}</h3>
                         <p style="margin: 0; font-size: 0.85em; color: #a9a9a9;">
-                          Character: ${world.characterName} | Turns: ${world.turnCount}
+                          Level: ${world.playerLevel} | Turns: ${world.turnCount}
                         </p>
                         <p style="margin: 4px 0 0 0; font-size: 0.8em; color: #777;">
                           Last played: ${new Date(world.lastPlayed).toLocaleString()}
@@ -119,17 +108,15 @@ export function renderEntry(container) {
         const worldId = btn.getAttribute("data-id");
         const world = savedWorlds.find(w => w.id == worldId);
 
-        // Placeholder: Load world data (will fetch from Supabase later)
+        if (!world) {
+          alert("Error loading world data.");
+          return;
+        }
+
         modal.remove();
 
         // Navigate to game UI with loaded world data
-        const worldData = {
-          characterName: world.characterName,
-          characterConcept: "Loaded Character",
-          worldName: world.name
-        };
-
-        renderGameUI(container, worldData);
+        renderGameUI(container, world);
       });
     });
   }
