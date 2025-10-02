@@ -326,6 +326,18 @@ button:hover {
   to { transform: rotate(360deg); }
 }
 
+/* Pulse animation for dice button */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255, 165, 0, 0.8);
+  }
+}
+
 /* Gallery Modal */
 .gallery-grid {
   display: grid;

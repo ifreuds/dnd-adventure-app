@@ -82,9 +82,20 @@ export function renderGameUI(container, worldData = {}) {
           <!-- Dice Panel -->
           <div class="dice-panel">
             <h3>Dice Roll</h3>
-            <p class="muted" style="font-size: 0.85em;">The AI will signal when a roll is needed.</p>
-            <button id="rollDiceBtn" style="width: 100%; padding: 12px; font-size: 1.1em;" disabled>
-              Roll d20
+            <div id="diceInfo" style="margin-bottom: 10px; padding: 8px; background: #1a1a1a; border-radius: 4px; border: 1px solid #333; display: none;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span id="diceIcon" style="font-size: 1.2em;">⚠️</span>
+                <span id="diceCheckType" style="font-size: 0.9em; color: #FFA500; font-weight: bold;">Check Required</span>
+              </div>
+              <div id="diceContext" style="font-size: 0.8em; color: #a9a9a9; line-height: 1.4;">
+                <!-- Context appears here -->
+              </div>
+              <div style="margin-top: 6px; font-size: 0.85em; color: #4CAF50;">
+                <strong>DC:</strong> <span id="diceDC">--</span>
+              </div>
+            </div>
+            <button id="rollDiceBtn" style="width: 100%; padding: 12px; font-size: 1.1em; transition: all 0.3s ease;" disabled>
+              🎲 Roll d20
             </button>
             <div id="diceResult" style="margin-top: 10px; text-align: center; font-size: 1.5em; color: #4CAF50; transition: transform 0.2s ease;">
               <!-- Dice result will appear here -->
@@ -103,6 +114,11 @@ export function renderGameUI(container, worldData = {}) {
     submitActionBtn: container.querySelector("#submitActionBtn"),
     rollDiceBtn: container.querySelector("#rollDiceBtn"),
     diceResult: container.querySelector("#diceResult"),
+    diceInfo: container.querySelector("#diceInfo"),
+    diceIcon: container.querySelector("#diceIcon"),
+    diceCheckType: container.querySelector("#diceCheckType"),
+    diceContext: container.querySelector("#diceContext"),
+    diceDC: container.querySelector("#diceDC"),
     saveBtn: container.querySelector("#saveBtn"),
     settingsBtn: container.querySelector("#settingsBtn"),
     modeToggleBtn: container.querySelector("#modeToggleBtn"),
@@ -137,31 +153,10 @@ export function renderGameUI(container, worldData = {}) {
   renderChoices(placeholderChoices);
 
   // Functions
-  function addNarration(text, showDmBadge = false) {
+  function addNarration(text) {
     const messageDiv = document.createElement("div");
     messageDiv.className = "narration-message";
-
-    // Add DM badge if requested
-    if (showDmBadge) {
-      const badge = document.createElement("span");
-      badge.className = "dm-badge";
-      badge.textContent = isMatureMode ? "🔞 Grok DM" : "🎲 GPT DM";
-      badge.style.cssText = `
-        display: inline-block;
-        padding: 2px 8px;
-        margin-bottom: 8px;
-        font-size: 0.75em;
-        font-weight: bold;
-        border-radius: 4px;
-        background: ${isMatureMode ? '#8B0000' : '#1a4d1a'};
-        color: #fff;
-      `;
-      messageDiv.appendChild(badge);
-      messageDiv.appendChild(document.createElement("br"));
-    }
-
-    const textNode = document.createTextNode(text);
-    messageDiv.appendChild(textNode);
+    messageDiv.textContent = text;
     el.chatMessages.appendChild(messageDiv);
     el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
   }
@@ -231,8 +226,8 @@ export function renderGameUI(container, worldData = {}) {
         sceneLog.shift();
       }
 
-      // Display narration with DM badge
-      addNarration(result.narration, true);
+      // Display narration
+      addNarration(result.narration);
 
       // Handle dice roll if required
       if (result.diceRequired) {
@@ -241,11 +236,38 @@ export function renderGameUI(container, worldData = {}) {
           dc: result.dc,
           context: result.diceContext
         };
+
+        // Extract check type (e.g., "Wisdom (Perception)" from the context)
+        const checkMatch = result.diceContext?.match(/^([A-Z][a-z]+\s*\([A-Za-z]+\))/);
+        const checkType = checkMatch ? checkMatch[1] : "Check Required";
+
+        // Show dice info panel
+        el.diceInfo.style.display = "block";
+        el.diceCheckType.textContent = checkType;
+        el.diceContext.textContent = result.diceContext || "A roll is needed!";
+        el.diceDC.textContent = result.dc || 13;
+
+        // Light up the dice button
         el.rollDiceBtn.disabled = false;
-        el.diceResult.textContent = result.diceContext || "Roll needed!";
-        el.diceResult.style.color = "#FFA500";
+        el.rollDiceBtn.style.background = "#FFA500";
+        el.rollDiceBtn.style.color = "#000";
+        el.rollDiceBtn.style.fontWeight = "bold";
+        el.rollDiceBtn.style.boxShadow = "0 0 15px rgba(255, 165, 0, 0.5)";
+        el.rollDiceBtn.style.animation = "pulse 1.5s infinite";
+
+        // Clear previous result
+        el.diceResult.textContent = "";
+
         renderChoices([]); // No choices until dice is rolled
       } else {
+        // Hide dice info and reset button
+        el.diceInfo.style.display = "none";
+        el.rollDiceBtn.style.background = "";
+        el.rollDiceBtn.style.color = "";
+        el.rollDiceBtn.style.fontWeight = "";
+        el.rollDiceBtn.style.boxShadow = "";
+        el.rollDiceBtn.style.animation = "";
+
         // Show new choices
         renderChoices(result.choices);
       }
@@ -289,7 +311,16 @@ export function renderGameUI(container, worldData = {}) {
   el.rollDiceBtn.addEventListener("click", () => {
     if (!diceActive) return;
 
+    // Reset button styling
     el.rollDiceBtn.disabled = true;
+    el.rollDiceBtn.style.background = "";
+    el.rollDiceBtn.style.color = "";
+    el.rollDiceBtn.style.fontWeight = "";
+    el.rollDiceBtn.style.boxShadow = "";
+    el.rollDiceBtn.style.animation = "";
+
+    // Hide dice info panel during roll
+    el.diceInfo.style.display = "none";
 
     // Animate dice roll with number cycling
     const finalRoll = Math.floor(Math.random() * 20) + 1;
@@ -350,7 +381,7 @@ export function renderGameUI(container, worldData = {}) {
               : await generateGptNarration(context);
             console.log(`✅ ${isMatureMode ? 'Grok' : 'GPT'} dice outcome received:`, result);
 
-            addNarration(result.narration, true);
+            addNarration(result.narration);
             renderChoices(result.choices);
 
             // Add outcome to scene log
