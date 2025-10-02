@@ -268,12 +268,28 @@ REQUIRED COVERAGE (fill ALL 10 areas completely):
    - Ask: Should companions have unique combat styles or passive bonuses?
 
 4. PROGRESSION SYSTEM (Level 1-20, game continues after max level)
-   XP CURVE (Balanced - not too easy, not too grindy):
-   - Level 2: 100 XP
-   - Level 3: 250 XP
-   - Level 4: 450 XP
-   - Level 5: 700 XP
-   - Continue scaling (total ~15,000 XP to reach Level 20)
+   XP CURVE (Balanced - MUST specify all 20 levels exactly):
+   Use this EXACT curve:
+   - Level 2: 100 XP (cumulative: 100)
+   - Level 3: 250 XP (cumulative: 350)
+   - Level 4: 450 XP (cumulative: 800)
+   - Level 5: 700 XP (cumulative: 1,500)
+   - Level 6: 1,000 XP (cumulative: 2,500)
+   - Level 7: 1,350 XP (cumulative: 3,850)
+   - Level 8: 1,750 XP (cumulative: 5,600)
+   - Level 9: 2,200 XP (cumulative: 7,800)
+   - Level 10: 2,700 XP (cumulative: 10,500)
+   - Level 11: 3,250 XP (cumulative: 13,750)
+   - Level 12: 3,850 XP (cumulative: 17,600)
+   - Level 13: 4,500 XP (cumulative: 22,100)
+   - Level 14: 5,200 XP (cumulative: 27,300)
+   - Level 15: 5,950 XP (cumulative: 33,250)
+   - Level 16: 6,750 XP (cumulative: 40,000)
+   - Level 17: 7,600 XP (cumulative: 47,600)
+   - Level 18: 8,500 XP (cumulative: 56,100)
+   - Level 19: 9,450 XP (cumulative: 65,550)
+   - Level 20: 10,450 XP (cumulative: 76,000)
+   Total to Level 20: 76,000 XP
 
    XP SOURCES:
    - Minor encounter: 10-25 XP
@@ -281,8 +297,11 @@ REQUIRED COVERAGE (fill ALL 10 areas completely):
    - Quest completion: 100-300 XP
    - Story milestone: 200-500 XP
 
-   LEVEL UP GAINS:
-   - Ask: What improves on level up? (+stat points, +HP, new abilities?)
+   LEVEL UP GAINS (specify exact progression):
+   - HP increase per level (e.g., +5-8 HP depending on class archetype)
+   - Stat points: +1 every even level (2, 4, 6, 8, 10, 12, 14, 16, 18, 20) = 10 points total
+   - New abilities at: Levels 3, 6, 9, 12, 15, 18, 20 (milestone levels)
+   - Can customize this if user requests different progression
 
    POST-LEVEL 20:
    - Game continues, stats maxed out, story-driven progression
@@ -328,19 +347,44 @@ REQUIRED COVERAGE (fill ALL 10 areas completely):
    - Skills: Persuasion, deception, intimidation, brute force
    - Ask: Should social encounters use dice rolls (DC-based) or pure choice-based outcomes?
 
-9. RELATIONSHIP SYSTEM (0-100+ points per NPC)
+9. RELATIONSHIP SYSTEM (-100 to +150 points per NPC)
    - Tracking: Per NPC, stored in save file
-   - Gain points from:
-     * Paying attention to NPC dialogue
-     * Making choices that align with NPC values
-     * Completing quests together
-     * Gift-giving, special interactions
-   - Milestones:
-     * 50 points: Friend/trusted ally
-     * 100 points: Romance/deep bond unlocked
-     * 100+: Deeper story arcs available
-   - Ask: How fast should relationships progress? (Slow/Moderate/Fast)
-   - Note: Relationship status viewable on demand (not always visible)
+   - Range: -100 (hostile enemy) to +150 (soulmate/true confidant)
+
+   NEGATIVE RELATIONSHIPS (Enemies):
+   - Starting points for enemies: -10 to -80 (depending on backstory)
+   - -80 to -100: Hostile enemy, attacks on sight, nearly impossible to befriend
+   - -50 to -79: Active antagonist, opposes player, very hard to improve
+   - -20 to -49: Distrusts player, unfriendly, can be improved with effort
+   - -1 to -19: Mild dislike, cautious, easier to improve
+
+   NEUTRAL TO POSITIVE RELATIONSHIPS:
+   - 0: Neutral stranger, no opinion
+   - 1-29: Acquaintance, polite but distant
+   - 30-49: Friendly, willing to help occasionally
+   - 50-74: Friend/trusted ally, reliable support
+   - 75-99: Close friend, deep trust, romantic interest possible
+   - 100-149: Romance unlocked, intimate relationship
+   - 150+: Soulmate/true confidant, deepest bond, unique story arcs
+
+   POINT CHANGES:
+   - Aligned choices: +3 to +10
+   - Opposing choices: -5 to -15
+   - Completing quests together: +10 to +30
+   - Gift-giving: +5 to +20 (if appropriate)
+   - Saving their life: +20 to +50
+   - Betrayal/major opposition: -30 to -60
+   - Paying attention to dialogue: +2 to +5
+
+   PROGRESSION DIFFICULTY:
+   - Positive relationships (0 to 150): Normal progression
+   - Recovering from negative (-50 to 0): Slower, requires consistent good actions
+   - Deep negative (-80 to -50): Very slow, major story events needed
+   - Hostile enemy (-100 to -80): Nearly impossible without major redemption arc
+
+   DISPLAY:
+   - Relationship status viewable on demand (not always visible)
+   - Progression speed: Moderate (balanced between rewarding and meaningful)
 
 10. HAZARDS & TRAPS
     - Story-driven: DM hints at dangers in narration
@@ -397,9 +441,16 @@ Party Rolls: Single d20 + player stats + companion bonuses
 Combat Role: [Narrative assist / Passive bonuses / Combat styles]
 
 === PROGRESSION (Level 1-20) ===
-XP Curve: Lv2=100, Lv3=250, Lv4=450, Lv5=700... (~15k total)
+XP Curve (EXACT - ALL 20 LEVELS):
+Lv2=100 (total 100), Lv3=250 (total 350), Lv4=450 (total 800), Lv5=700 (total 1,500)
+Lv6=1,000 (total 2,500), Lv7=1,350 (total 3,850), Lv8=1,750 (total 5,600), Lv9=2,200 (total 7,800)
+Lv10=2,700 (total 10,500), Lv11=3,250 (total 13,750), Lv12=3,850 (total 17,600), Lv13=4,500 (total 22,100)
+Lv14=5,200 (total 27,300), Lv15=5,950 (total 33,250), Lv16=6,750 (total 40,000), Lv17=7,600 (total 47,600)
+Lv18=8,500 (total 56,100), Lv19=9,450 (total 65,550), Lv20=10,450 (total 76,000)
+TOTAL TO LEVEL 20: 76,000 XP
+
 XP Rewards: Minor 10-25, Major 50-100, Quest 100-300, Milestone 200-500
-Level Up Gains: [Stats/HP/Abilities - specify]
+Level Up Gains: +5-8 HP per level, +1 stat point every even level (10 total), New abilities at Lv 3/6/9/12/15/18/20
 Post-20: Game continues, stats maxed
 
 === CURRENCY & INVENTORY ===
@@ -432,11 +483,28 @@ Resolution: [DC-based rolls / Pure choice outcomes]
 Skills: Persuasion, deception, intimidation, brute force
 
 === RELATIONSHIP POINTS (Per NPC) ===
-Range: 0-100+
-Gain From: Attention, aligned choices, quests, gifts
-Milestones: 50=Friend, 100=Romance/Deep Bond
-Progression Speed: [Slow / Moderate / Fast]
+Range: -100 (hostile enemy) to +150 (soulmate/confidant)
+
+Negative (Enemies):
+-80 to -100: Hostile enemy (attacks on sight, nearly impossible to befriend)
+-50 to -79: Active antagonist (opposes player, very hard to improve)
+-20 to -49: Distrusts player (unfriendly, improvable with effort)
+-1 to -19: Mild dislike (cautious, easier to improve)
+
+Neutral to Positive:
+0: Neutral stranger
+1-29: Acquaintance
+30-49: Friendly
+50-74: Friend/trusted ally
+75-99: Close friend (romantic interest possible)
+100-149: Romance unlocked
+150+: Soulmate/true confidant
+
+Point Changes: Aligned choices +3 to +10, Opposing -5 to -15, Quests +10 to +30, Gifts +5 to +20, Save life +20 to +50, Betrayal -30 to -60, Dialogue +2 to +5
+
+Progression Difficulty: Positive (normal), Negative recovery (slower), Deep negative (very slow), Hostile (nearly impossible)
 Display: On-demand fetch (not always visible)
+Progression Speed: Moderate
 
 === HAZARDS & TRAPS ===
 Detection: DM hints, perception checks
