@@ -123,10 +123,25 @@ export function renderHybridChat(currentStep, stepKey, config, wizardData, guide
       onUpdate();
 
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      console.error('❌ Chat error:', error);
+
+      // Remove failed user message
       wizardData.chatHistory[stepKey].pop();
       localStorage.setItem(`wizard_chat_${stepKey}`, JSON.stringify(wizardData.chatHistory[stepKey]));
+
+      // Show error message in UI
+      alert(`Error: ${error.message}\n\nThe input has been re-enabled. You can try again or rephrase your message.`);
+
+      // Re-enable input immediately
       onUpdate();
+
+      // Make sure inputs are enabled after re-render
+      setTimeout(() => {
+        const retryInput = el.inputArea.querySelector('#chatInput');
+        const retryBtn = el.inputArea.querySelector('#sendBtn');
+        if (retryInput) retryInput.disabled = false;
+        if (retryBtn) retryBtn.disabled = false;
+      }, 100);
     }
   }
 
@@ -169,8 +184,24 @@ export function renderHybridChat(currentStep, stepKey, config, wizardData, guide
 
         onUpdate();
       } catch (error) {
-        alert(`Error generating initial draft: ${error.message}`);
+        console.error('❌ Auto-generation error:', error);
+
+        // Show error with helpful message
+        alert(`Error generating initial draft: ${error.message}\n\nYou can try manually typing a message, or refresh the page to start over.`);
+
+        // Re-render and ensure input is enabled
         onUpdate();
+
+        // Enable inputs after render
+        setTimeout(() => {
+          const retryInput = el.inputArea.querySelector('#chatInput');
+          const retryBtn = el.inputArea.querySelector('#sendBtn');
+          if (retryInput) {
+            retryInput.disabled = false;
+            retryInput.placeholder = "Try typing your request manually, or refresh to restart...";
+          }
+          if (retryBtn) retryBtn.disabled = false;
+        }, 100);
       }
     })();
   }

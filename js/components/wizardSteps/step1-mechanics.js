@@ -68,62 +68,28 @@ export function getStep1InitialMessage(wizardData) {
   const approach = wizardData.mechanicsApproach;
 
   if (approach === 'defaults') {
-    return `Great! You've chosen <strong>Balanced Defaults</strong>.
+    return `I've selected Balanced Defaults for game mechanics.
 
-I'll help you understand and customize the default mechanics:
+Please create a COMPLETE rules system covering all 10 required areas (Core Mechanics, Combat, Companions, Progression, Currency & Inventory, Abilities & Magic, Crafting, Social Mechanics, Relationship Points, Hazards & Traps).
 
-<strong>📊 Combat System</strong>
-- d20 + stat modifier vs DC (10=Easy, 13=Normal, 16=Hard)
-- Turn-based (individual for 1-3 turns, then summarized every 3 rounds)
-- Boss fights: 6-12 turns with narrative compression
+Use balanced defaults for everything. Fill all areas with specific values - do NOT leave any "[To be defined]" placeholders.
 
-<strong>📈 Progression</strong>
-- Levels 1-20 (balanced XP curve, ~15k total to max)
-- +1 stat per level, max modifier +10 (stat cap 30)
-- Sources: Base (8-15), Racial (-2 to +4), Levels (+19), Equipment (+8), Companions (+5)
-
-<strong>💰 Economy & Inventory</strong>
-- Single currency (you name it)
-- Key items only (quest items, special equipment, relics)
-
-<strong>👥 Companions</strong>
-- Max 2 companions, share player level
-- Each provides stat bonuses matching their story
-
-<strong>❤️ Relationship System</strong>
-- 0-150+ points per NPC
-- 50=Friend, 100=Romance, 150=Mature content
-- Gains: Dialogue +2-5, Choices +3-10, Quests +10-30
-
-Would you like to customize any of these, or should I write them all to the Living File as-is?`;
+Make intelligent choices that fit the world context from Step 0. Then ask me to review it and let you know if I want to change anything.`;
   } else {
-    return `Perfect! You've chosen <strong>Custom Mechanics</strong>.
+    return `I've selected Custom Mechanics.
 
-Let's build your game systems from the ground up! I'll help you define:
+Please create a COMPLETE rules system covering all 10 required areas (Core Mechanics, Combat, Companions, Progression, Currency & Inventory, Abilities & Magic, Crafting, Social Mechanics, Relationship Points, Hazards & Traps).
 
-<strong>📊 Combat System</strong> - How do battles work? (dice, turn structure, enemy AI)
-<strong>📈 Progression</strong> - How do players level up? (XP curve, stat gains, level cap)
-<strong>💰 Economy & Inventory</strong> - What can players collect and buy?
-<strong>👥 Companions</strong> - How do party members work?
-<strong>❤️ Relationship System</strong> - How do NPC relationships develop?
+Make creative choices that fit the world context from Step 0. Fill everything with specific values - do NOT leave any "[To be defined]" placeholders.
 
-Where would you like to start? Or tell me your vision and I'll organize it!`;
+Then ask me to review it and let you know if I want to change anything.`;
   }
 }
 
 export function buildStep1Context(wizardData, userMessage) {
-  const mechanicsContext = `
-MECHANICS APPROACH: ${wizardData.mechanicsApproach === 'defaults' ? 'Balanced Defaults' : 'Custom Mechanics'}
-
-${wizardData.mechanicsApproach === 'defaults' ?
-    `Using default mechanics (d20 combat, levels 1-20, relationship 0-150+, max 2 companions).
-The user may want to customize specific aspects or accept defaults as-is.` :
-    `Building custom mechanics from scratch. Help the user define combat, progression, inventory, companions, and relationships.`
-  }
-
-Reference the world context from Step 0 if available.`;
-
-  return mechanicsContext + '\n\n' + userMessage;
+  // Context is already passed in aiAssistant.js system prompt
+  // Just return the user message as-is to avoid redundancy
+  return userMessage;
 }
 
 export function isStep1Complete(wizardData) {

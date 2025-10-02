@@ -10,8 +10,9 @@ export async function callWorldBuildingAssistant(stepKey, userMessage, wizardDat
     throw new Error("No API key found. Please add your OpenAI API key in Settings.");
   }
 
-  // Build user inputs context for Step 0
+  // Build user inputs context for each step
   let userInputsContext = '';
+
   if (stepKey === 'step0') {
     userInputsContext = `\n\nUSER'S INITIAL INPUTS:
 World Name: ${wizardData.worldName || '[Not provided]'}
@@ -20,6 +21,16 @@ Main Conflict: ${wizardData.worldConflict || '[Not provided]'}
 Narrative Style: ${wizardData.narrativeStyle || '[Not provided]'}
 
 IMPORTANT: Use the Narrative Style "${wizardData.narrativeStyle}" in your conversational tone and Living File content.`;
+  }
+
+  if (stepKey === 'step1') {
+    const approach = wizardData.mechanicsApproach === 'defaults' ? 'Balanced Defaults' : 'Custom Mechanics';
+    userInputsContext = `\n\nUSER'S MECHANICS APPROACH: ${approach}
+
+${wizardData.mechanicsApproach === 'defaults' ?
+  'IMPORTANT: Use balanced defaults for all 10 areas. Make sensible default choices.' :
+  'IMPORTANT: Create creative custom mechanics that fit the world theme.'
+}`;
   }
 
   // Build context: existing Living Files from other steps
@@ -98,17 +109,32 @@ IMPORTANT: Use the Narrative Style "${wizardData.narrativeStyle}" in your conver
         }
       }
 
-      // Strategy 3: Find first { to last } (handles text before/after JSON)
+      // Strategy 3: Find first { and match closing } with proper nesting
       if (!result) {
         const firstBrace = messageContent.indexOf('{');
-        const lastBrace = messageContent.lastIndexOf('}');
-        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-          const extracted = messageContent.substring(firstBrace, lastBrace + 1);
-          try {
-            result = JSON.parse(extracted);
-            console.log("✅ Extracted JSON from text (first { to last })");
-          } catch (innerError) {
-            console.error("❌ Brace extraction failed");
+        if (firstBrace !== -1) {
+          let depth = 0;
+          let closingBrace = -1;
+
+          for (let i = firstBrace; i < messageContent.length; i++) {
+            if (messageContent[i] === '{') depth++;
+            if (messageContent[i] === '}') {
+              depth--;
+              if (depth === 0) {
+                closingBrace = i;
+                break;
+              }
+            }
+          }
+
+          if (closingBrace !== -1) {
+            const extracted = messageContent.substring(firstBrace, closingBrace + 1);
+            try {
+              result = JSON.parse(extracted);
+              console.log("✅ Extracted JSON from text (proper brace matching)");
+            } catch (innerError) {
+              console.error("❌ Brace extraction failed:", innerError.message);
+            }
           }
         }
       }
