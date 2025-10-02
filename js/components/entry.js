@@ -2,6 +2,9 @@ import { renderWorldWizard } from "./worldWizard.js";
 import { renderGameUI } from "./gameUI.js";
 
 export function renderEntry(container) {
+  console.log("🔵 renderEntry called");
+  console.log("Container:", container);
+
   container.innerHTML = `
     <div style="text-align:center; margin-top:20%;">
       <h1>DnD Adventure</h1>
@@ -9,6 +12,8 @@ export function renderEntry(container) {
       <button id="loadWorldBtn">Load World</button>
     </div>
   `;
+
+  console.log("✅ Entry HTML set");
 
   document.getElementById("newWorldBtn").addEventListener("click", () => {
     // Clear all wizard data for fresh start
