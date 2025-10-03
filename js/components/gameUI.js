@@ -166,22 +166,67 @@ export function renderGameUI(container, worldData = {}) {
   let sceneLog = []; // Track recent turns for GPT context
   let pendingDiceRoll = null; // Store dice roll context
 
-  // Initialize with starting narration
-  const startingNarration = worldData.theme
-    ? `Welcome to ${worldData.theme || "your adventure"}! Your journey begins...`
-    : "You stand at the entrance of a dark forest. The trees loom overhead, their branches twisted like grasping hands. A faint mist swirls around your feet, and you hear distant whispers on the wind.";
+  // Update character panel from Save File
+  updateCharacterPanel();
+
+  // Extract Player Starting Story from Step 3 Living File
+  const step3Content = livingFiles.step3 || '';
+  const startingStoryMatch = step3Content.match(/===\s*PLAYER STARTING STORY\s*===\s*([\s\S]*?)(?===|$)/i);
+  const startingNarration = startingStoryMatch && startingStoryMatch[1].trim()
+    ? startingStoryMatch[1].trim()
+    : `Welcome to your adventure! Your journey begins...`;
 
   addNarration(startingNarration);
 
-  // Placeholder choices
+  // Extract first choices from starting story context or use defaults
   const placeholderChoices = [
-    "Enter the forest cautiously",
-    "Search the area for clues",
-    "Call out to see if anyone responds"
+    "Look around",
+    "Check your belongings",
+    "Move forward"
   ];
   renderChoices(placeholderChoices);
 
   // Functions
+  function updateCharacterPanel() {
+    const char = saveFile.character;
+
+    // Update basic info
+    el.charName.textContent = char.name || 'Hero';
+    el.charClass.textContent = char.class || 'Adventurer';
+    el.charHP.textContent = `${char.hp?.current || 20}/${char.hp?.max || 20}`;
+
+    // Update stats
+    container.querySelector('#statSTR').textContent = char.stats?.STR || 10;
+    container.querySelector('#statDEX').textContent = char.stats?.DEX || 10;
+    container.querySelector('#statCON').textContent = char.stats?.CON || 10;
+    container.querySelector('#statINT').textContent = char.stats?.INT || 10;
+    container.querySelector('#statWIS').textContent = char.stats?.WIS || 10;
+    container.querySelector('#statCHA').textContent = char.stats?.CHA || 10;
+
+    // Update abilities
+    const skillsList = container.querySelector('#skillsList');
+    if (char.abilities && char.abilities.length > 0) {
+      skillsList.innerHTML = char.abilities.map(ability => `
+        <div style="margin-bottom: 6px;">
+          <span style="color: #d97706;">⚔️</span> ${ability}
+        </div>
+      `).join('');
+    } else {
+      // Parse abilities from Step 3 Living File if not in Save File yet
+      const step3Content = livingFiles.step3 || '';
+      const abilitiesMatch = step3Content.match(/Starting Abilities:\s*([\s\S]*?)(?=\n\n===|\n\n[A-Z]|$)/i);
+      if (abilitiesMatch) {
+        const abilitiesText = abilitiesMatch[1].trim();
+        const abilities = abilitiesText.split('\n').filter(a => a.trim().startsWith('-')).map(a => a.replace(/^-\s*/, '').trim());
+        skillsList.innerHTML = abilities.map(ability => `
+          <div style="margin-bottom: 6px;">
+            <span style="color: #d97706;">⚔️</span> ${ability}
+          </div>
+        `).join('');
+      }
+    }
+  }
+
   function addNarration(text) {
     const messageDiv = document.createElement("div");
     messageDiv.className = "narration-message";
@@ -242,6 +287,7 @@ export function renderGameUI(container, worldData = {}) {
         saveFile = applySaveFileUpdates(saveFile, result.updates);
         localStorage.setItem('current_saveFile', JSON.stringify(saveFile));
         console.log('📊 Save File updated:', result.updates);
+        updateCharacterPanel();  // Refresh character display
       }
 
       // Add to scene log

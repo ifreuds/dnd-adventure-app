@@ -23,11 +23,11 @@ export function createNewSaveFile(wizardData) {
       class: wizardData.characterClass || "Adventurer",
       level: 1,
       xp: 0,
-      hp: { current: 20, max: 20 },  // Will be updated based on CON
+      hp: calculateInitialHP(wizardData.pointBuyStats),
       stats: wizardData.pointBuyStats || {
         STR: 10, DEX: 10, CON: 10, INT: 10, WIS: 10, CHA: 10
       },
-      abilities: [],  // Parsed from Step 3 Living File
+      abilities: parseAbilitiesFromLivingFile(wizardData.livingFiles?.step3 || ''),
       statusEffects: []
     },
 
@@ -44,6 +44,42 @@ export function createNewSaveFile(wizardData) {
 
     progressSummary: ""  // Will be updated as story progresses
   };
+}
+
+/**
+ * Calculate initial HP based on CON stat
+ */
+function calculateInitialHP(stats) {
+  const con = stats?.CON || 10;
+  const conModifier = Math.floor((con - 10) / 2);
+  const baseHP = 10;  // Base HP at level 1
+  const maxHP = baseHP + conModifier;
+
+  return {
+    current: Math.max(1, maxHP),  // Minimum 1 HP
+    max: Math.max(1, maxHP)
+  };
+}
+
+/**
+ * Parse abilities from Step 3 Living File
+ */
+function parseAbilitiesFromLivingFile(step3Content) {
+  // Match "Starting Abilities:" section
+  const abilitiesMatch = step3Content.match(/Starting Abilities:\s*([\s\S]*?)(?=\n\n===|\n\n[A-Z]|$)/i);
+
+  if (abilitiesMatch) {
+    const abilitiesText = abilitiesMatch[1].trim();
+    // Extract bullet points (lines starting with -)
+    const abilities = abilitiesText
+      .split('\n')
+      .filter(line => line.trim().startsWith('-'))
+      .map(line => line.replace(/^-\s*/, '').trim());
+
+    return abilities.length > 0 ? abilities : [];
+  }
+
+  return [];
 }
 
 /**
