@@ -220,6 +220,40 @@ When user completes pre-fill form and clicks "Generate":
   - **Console logging**: Check browser console to verify which API is called
   - **Seamless switching**: Can toggle modes mid-game, all context flows to active DM
 
+### ✅ Living File Integration into Gameplay
+- **How it works**:
+  1. Wizard creates 4 Living Files (Step 0-3) stored in localStorage
+  2. Game start loads all 4 Living Files + creates/loads Save File
+  3. DM receives full context: Living Files (static, cached) + Save File (dynamic, updates each turn)
+  4. DM returns narration + delta updates (hp: -5, xp: +100, npc_lyra_relationship: +10)
+  5. Frontend applies deltas to Save File, saves to localStorage
+
+- **Two-Tier Data System**:
+  - **Living Files (static, never change)**:
+    - Step 0: World theme, factions, DM narration rules
+    - Step 1: Game mechanics, fractional combat, XP curve
+    - Step 2: NPC profiles (backstories, personalities, general stance: Ally/Neutral/Enemy)
+    - Step 3: Player character backstory
+    - Cached by GPT after first turn (90% discount on 6k-8k tokens!)
+
+  - **Save File (dynamic, updates every turn)** - `js/services/saveFile.js`:
+    - Character: HP, XP, level, stats, abilities, status effects
+    - NPCs: Current relationship points, status (alive/recruited), location, flags, last interaction
+    - Inventory: Gold, items with counts
+    - Factions: Reputation levels
+    - Story Flags: Checkpoints, milestones
+    - Progress Summary: Narrative overview
+
+- **Token Optimization**:
+  - Output format enforces: short choices (3-6 words), omit empty fields, minified JSON, delta updates only
+  - Result: Output reduced from 1500+ tokens to 300-400 tokens per turn
+  - Cost: 100-turn campaign ~$0.12 (was ~$0.50+ before optimization)
+
+- **File**: `js/services/saveFile.js`
+  - `createNewSaveFile(wizardData)` - Parses Living Files, creates initial game state
+  - `applySaveFileUpdates(saveFile, updates)` - Applies delta updates, validates, returns new state
+  - Handles relative changes (hp: -5), additive changes (flags_add: ["secret"]), inventory management
+
 ### ❌ Backend Integration - Not Yet Connected
 - **Supabase** - Placeholder save/load (js/services/supabase.js exists but empty)
 - **Image Generation API** - Using placeholder images (js/services/imageService.js exists but empty)
