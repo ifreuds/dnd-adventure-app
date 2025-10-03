@@ -345,3 +345,210 @@ All modals use overlay pattern (no full page replacement):
 - **Loading feedback**: "DM is thinking" indicator shows after dice animation completes
 - **Simplified context**: Only check type sent to API, not full success/failure descriptions
 - **Token optimization**: Context stripped to prevent GPT-5-mini reasoning token overflow
+
+---
+
+## Architectural Redesign (In Progress)
+
+### Issues with Current v1 Implementation
+
+After initial testing, critical problems identified:
+
+1. **AI Too Powerful** - Makes all mechanical decisions (DCs, XP, relationship points) → inconsistent, unpredictable
+2. **Spoiler Problem** - AI reveals outcomes before they happen: "Make Persuasion check DC 13. Success: X, Failure: Y"
+3. **No Structure** - Everything emergent from AI → hard to follow, confusing story flow
+4. **Bad Narration** - AI narrates mechanics instead of story, uses overly poetic language ("eyes bright as nails")
+5. **Random Rewards** - AI decides arbitrarily: +5 or +50 relationship? No consistency
+
+### Proposed v2: Tag-Based Detection System
+
+**Core Philosophy**: Separate "WHAT happens" (systematic) from "HOW it's narrated" (creative)
+
+```
+┌─────────────────────────────────────────────┐
+│ GAME ENGINE (LOCAL/SYSTEMATIC)              │
+│ - Processes event tags                      │
+│ - Applies rules-based rewards               │
+│ - Updates Save File predictably             │
+└─────────────────────────────────────────────┘
+              ↑                    ↓
+        (event tags)          (context)
+              ↑                    ↓
+┌─────────────────────────────────────────────┐
+│ AI NARRATOR (CREATIVE)                      │
+│ - Writes vivid narration                    │
+│ - Creates NPC dialogue                      │
+│ - Tags what happened                        │
+│ - NEVER makes mechanical decisions          │
+└─────────────────────────────────────────────┘
+```
+
+### How Tag System Works
+
+**Example: Talking to Multiple NPCs**
+
+1. **Player Input:**
+```
+"I ask Lyra, Marcus, and Garruk about the runic core"
+```
+
+2. **AI Response (Two-Part JSON):**
+```json
+{
+  "narration": "You gather the three around the campfire.\n\nLyra leans forward, eyes sharp. \"The core is dangerous. I've seen what happens when they crack.\"\n\nMarcus nods grimly. \"The Crown wants it for their rune-forges. Bad news.\"\n\nGarruk just grunts. \"Sell it. Get coin. Move on.\"",
+  
+  "tags": {
+    "event_type": "conversation",
+    "npcs_present": ["lyra", "marcus", "garruk"],
+    "topic": "runic_core_knowledge",
+    "skill_used": "none"
+  },
+  
+  "choices": ["Ask about the Crown", "Ask about selling it", "Show them the map"]
+}
+```
+
+3. **System Processing (Local Game Engine):**
+```javascript
+// Apply systematic rules based on tags
+if (tags.event_type === "conversation" && tags.skill_used === "none") {
+  // Casual conversation - fixed relationship gain
+  tags.npcs_present.forEach(npcId => {
+    updateRelationship(npcId, +5);
+  });
+  addXP(30);  // 3 NPCs × 10 XP each
+}
+
+// Display results
+showNotification("Lyra +5, Marcus +5, Garruk +5 | +30 XP");
+```
+
+### Key Principles
+
+**AI NEVER decides:**
+- ❌ Difficulty checks (DCs)
+- ❌ XP rewards
+- ❌ Relationship point changes
+- ❌ When dice rolls happen
+- ❌ Combat outcomes (damage, death)
+- ❌ Loot drops
+
+**AI ONLY provides:**
+- ✅ Vivid narration (scene descriptions, atmosphere)
+- ✅ NPC dialogue and reactions
+- ✅ Event tags (what happened)
+- ✅ Story choices (narrative options, not mechanical)
+
+**System handles:**
+- ✅ Processing tags
+- ✅ Applying reward rules
+- ✅ Calculating DCs (based on difficulty tables)
+- ✅ Combat mechanics (HP, damage, initiative)
+- ✅ Updating Save File
+
+### Systematic Reward Rules (Proposed)
+
+**Conversation (no check):**
+- Each NPC present: +5 relationship
+- XP: 10 per NPC
+
+**Social Checks (persuade, intimidate, etc.):**
+- Success: +10 to +20 per NPC (based on difficulty)
+- Failure: -5 per NPC
+- XP: 30-50 success, 10 failure
+
+**Combat:**
+- XP: Enemy level × 20 per enemy
+- Loot: Based on enemy type (predefined tables)
+- Faction reputation: -10 to -30 for killing faction members
+
+**Exploration:**
+- New location: +25 XP
+- Secret discovered: +50 XP
+- No relationship changes
+
+### Enhanced NPC Data Structure
+
+```javascript
+{
+  "id": "lyra",
+  "name": "Lyra Nightwhisper",
+  "stance": "ally",
+  
+  // NEW: Personality system
+  "interests": ["runes", "freedom", "justice"],
+  "dislikes": ["crown", "slavery", "betrayal"],
+  
+  // NEW: Relationship modifiers
+  "relationship_modifiers": {
+    "easy_topics": ["runes", "freedom"],  // Bonus on these topics
+    "hard_topics": ["family", "past"]     // Penalty on these topics
+  },
+  
+  // NEW: Combat data (if recruitable)
+  "combat": {
+    "level": 3,
+    "hp": 22,
+    "bonuses": ["+2 DEX", "+1 INT"],
+    "abilities": ["Sneak Attack", "Lockpicking"]
+  }
+}
+```
+
+### Event Tag Schema (Proposed)
+
+**Basic Tags:**
+- `event_type`: "conversation" | "combat_start" | "social_challenge" | "exploration" | "rest"
+- `npcs_present`: Array of NPC IDs involved
+- `location`: Current location ID
+
+**Combat Tags:**
+```json
+{
+  "event_type": "combat_start",
+  "enemies": [
+    {"id": "crown_soldier_1", "level": 2, "faction": "crown"}
+  ],
+  "allies_present": ["lyra", "marcus"],
+  "surprise": true  // Player attacked first
+}
+```
+
+**Social Challenge Tags:**
+```json
+{
+  "event_type": "social_challenge",
+  "skill_required": "CHA",
+  "difficulty": "normal",  // System calculates DC from this
+  "npcs_targeted": ["foreman"],
+  "intent": "persuade"  // persuade, intimidate, deceive, etc.
+}
+```
+
+### Open Design Questions
+
+1. **Tag Autonomy**: Should AI decide tags independently, or should system provide hints based on player action keywords?
+2. **Tag Granularity**: Detailed tags (with all context) vs simple tags (minimal info)?
+3. **Unexpected Actions**: How to handle creative/weird player actions? ("juggle torches while singing")
+4. **Multi-NPC Dynamics**: Equal relationship gains vs relevance-based (Lyra +10, Marcus +5, Garruk +2)?
+
+### Implementation Plan (Not Started)
+
+1. **Define Event Tag Schema** - Finalize all tag types and structures
+2. **Create Game Engine** - `js/services/gameEngine.js` to process tags
+3. **Define Reward Rules** - Clear formulas for XP, relationships, loot
+4. **Update AI Prompts** - Focus on narration + tagging, remove mechanical decisions
+5. **Enhance NPC Data** - Add interests, dislikes, combat stats
+6. **Test Tag-Based Flow** - Verify emergent, player-driven gameplay works
+7. **Refine Based on Testing** - Adjust rules, tag granularity, AI prompts
+
+### Benefits of Tag-Based System
+
+- ✅ **Emergent Gameplay** - No predetermined scenarios, player drives story
+- ✅ **Dynamic Multi-NPC** - All present NPCs react appropriately
+- ✅ **Systematic Rewards** - Predictable, balanced progression
+- ✅ **No Spoilers** - AI doesn't reveal outcomes beforehand
+- ✅ **Better Narration** - AI focuses on storytelling, not mechanics
+- ✅ **Player Agency** - Actions matter, clear cause → effect
+
+**Status**: Concept phase. Awaiting design decisions before implementation.
