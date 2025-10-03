@@ -143,24 +143,49 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
 
 ### ✅ Completed (Frontend Skeleton)
 - **Entry Screen** - New World / Load World buttons with full navigation
-- **World Creation Wizard** - ✅ **REFACTORED & ENHANCED** - Modular hybrid AI-assisted wizard
+- **World Creation Wizard** - ✅ **FULLY OVERHAULED** - Streamlined AI-assisted wizard
   - **Modular Architecture**: Split into separate files for maintainability
     - `worldWizard.js` (396 lines) - Main orchestrator
-    - `wizardSteps/step0-theme.js` - Theme & Tone with pre-fill + AI chat
-    - `wizardSteps/step1-mechanics.js` - Rules & Mechanics with defaults/custom
-    - `wizardSteps/step2-npcs.js` - NPCs & Factions with dynamic list + romance focus
+    - `wizardSteps/step0-theme.js` - Theme & Tone with pre-fill + AI expansion
+    - `wizardSteps/step1-mechanics.js` - Rules & Mechanics (defaults auto-generated)
+    - `wizardSteps/step2-npcs.js` - NPCs (number selection → AI creates profiles)
     - `wizardSteps/step3-character.js` - Character Creation with point-buy system
     - `wizardSteps/sharedChat.js` - Hybrid chat UI logic
-    - `wizardSteps/aiAssistant.js` - GPT API integration
-    - `wizardSteps/guidelines.js` - AI conversation guidelines
-  - **Step 0 (Theme & Tone)**: Pre-fill (World Name, Genre, Conflict, Narrative Style) → AI expands
-  - **Step 1 (Rules & Mechanics)**: Choose defaults or custom → AI helps define systems
-  - **Step 2 (NPCs & Factions)**: Dynamic NPC list → AI creates detailed profiles with romance support
-  - **Step 3 (Character Creation)**: Hybrid form + point-buy (27pts) → AI generates backstory
-  - **Auto-generation**: First AI response auto-triggers with draft Living File
+    - `wizardSteps/aiAssistant.js` - GPT API integration with token logging
+    - `wizardSteps/guidelines.js` (651 lines) - Comprehensive AI guidelines per step
+
+  - **Step 0 (Theme & Tone)**: 7 areas auto-generated
+    - Pre-fill: World Name, Genre, Conflict, Narrative Style (6 dropdown options)
+    - AI creates: Premise, Objective, Setting, Locations (3-5), **Factions (2-4)**, Tone, **DM Narration Rules**
+    - **DM Narration Rules**: Combat 1 para, Conversation 1-2 paras, Romance 2-3 paras, max 3 paras
+    - No questions asked - complete draft on first response
+
+  - **Step 1 (Rules & Mechanics)**: 10 areas auto-generated with balanced defaults
+    - Choose: Balanced Defaults or Custom
+    - AI creates: Core mechanics, **Fractional combat system**, Companions, **Streamlined XP (15,000 total)**, Inventory, Magic, Crafting, Social, Relationships, Hazards
+    - **Combat**: Group enemies = combined HP, multiple attacks, cleave mechanics
+    - **Death**: First=saved+debuff, Second+=permadeath (can continue)
+    - **Progression**: +6 HP/level, +1 stat/level (19 total), XP 15k (was 76k)
+    - No questions asked - complete rules on first response
+
+  - **Step 2 (NPCs & Factions)**: Select count → AI creates all profiles
+    - Select 3-6 NPCs
+    - AI creates: Name, race, role, backstory, **concise physical description**, personality, starting relationship, companion stats, faction assignment
+    - **All NPCs recruitable and romanceable** (no toggles)
+    - Factions assigned from Step 0
+    - No manual NPC list - AI generates everything
+
+  - **Step 3 (Character Creation)**: Hybrid form + point-buy + AI backstory
+    - Fill: Name, gender, race, class, goal
+    - Point-buy: 27 points (stats 8-15)
+    - AI creates: Backstory, racial bonuses, physical description, personality, abilities, equipment
+
+  - **Auto-generation**: All steps auto-trigger AI on form submission
+  - **Token Efficiency**: Removed redundancy, concise formats, ~200 lines saved
+  - **Prompt Caching**: Automatic (90% discount on cached tokens)
   - **Guideline Editor**: Advanced users can customize AI behavior per step
   - Data persists across step navigation
-  - Finishes into Main Game UI with wizard data
+  - Finishes into Main Game UI with 4 Living Files
 - **Main Game UI** - Complete game interface
   - Chat-based narration with choice buttons + free text input
   - Character panel (name, class, HP, stats, skills/abilities)
@@ -183,12 +208,17 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
   - Settings modal for API key (stored in localStorage)
   - Scene log tracking (last 10 turns)
   - Dice roll integration with outcomes
+  - **Token Usage Logging**: Detailed console breakdown
+    - Input tokens, output tokens, total tokens
+    - Reasoning tokens (GPT-5-mini specific)
+    - **Prompt caching detection**: Shows cached vs fresh tokens, calculates savings
+    - Pricing: $0.25/1M input, $0.025/1M cached (90% discount!), $2/1M output
   - **Known GPT-5-mini quirks:**
     - Cannot use `response_format: { type: "json_object" }` - causes empty responses
     - Cannot customize `temperature` - only default (1) supported
     - Uses `max_completion_tokens` instead of `max_tokens`
     - Reasoning tokens (~2000) can consume all tokens if not careful
-    - **Current limit**: 3500 tokens (2000 reasoning + 1500 response)
+    - **World building limit**: 16,000 tokens (larger context for wizard)
 
 - **Grok API integration (Mature Mode)** - ✅ Working!
   - Model: `grok-4-fast-reasoning`
@@ -222,28 +252,20 @@ A browser-based, modular **text-adventure RPG** inspired by D&D.
 1. ✅ ~~**Connect GPT API**~~ - DONE! Working with gpt-5-mini-2025-08-07
 2. ✅ ~~**Add Mature Mode AI**~~ - DONE! Working with grok-4-fast-reasoning
 3. ✅ ~~**Enhance Dice UI**~~ - DONE! Pulsing button + compact info panel
-4. ✅ ~~**Improve World Creation Wizard**~~ - DONE! Refactored with AI-assisted hybrid mode
-5. **Refine AI Prompts** - Better tone/style consistency, improve choice quality
-6. **Test & Polish Wizard** - End-to-end testing of all 4 steps, fix AI conversation flow
-7. **Connect Supabase** - Implement save/load system (Scene Log, Save File, Progress Summary)
-8. **Wire up Image Generation API** - Real image generation from prompts
-9. **Implement Autosave** - Every turn + checkpoint (20 turns) saves
-10. **Polish & Testing** - End-to-end gameplay testing
+4. ✅ ~~**Overhaul World Creation Wizard**~~ - DONE! Complete guideline rewrite
+5. ✅ ~~**Token Optimization**~~ - DONE! Prompt caching, concise formats, ~200 lines saved
+6. **Test Wizard End-to-End** - Verify all 4 steps generate correctly
+7. **Integrate Living Files into Game Context** - Pass 4 Living Files to gameplay DM
+8. **Connect Supabase** - Implement save/load system (Scene Log, Save File, Progress Summary)
+9. **Wire up Image Generation API** - Real image generation from prompts
+10. **Implement Autosave** - Every turn + checkpoint (20 turns) saves
 
-## Session Notes (for next session)
-- ✅ GPT-5-mini integration working (Normal Mode)
-- ✅ Grok-4-Fast integration working (Mature Mode)
-- ✅ Mode switching seamless with visual indicators
-- ✅ Dice UI enhanced with pulsing button and compact info panel
-- ✅ Dice roll fixes:
-  - Spoilers hidden (success/failure outcomes not shown before roll)
-  - Loading indicator shows after dice animation
-  - Context simplified to prevent GPT-5-mini token overflow
-  - Token limit increased to 3500
-- 📋 **Next Priority**: World Creation Wizard improvements
-  - Current: Manual input fields
-  - Goal: AI-assisted conversation mode
-  - Once world tone/style established, gameplay will be more cohesive
-  - **Important**: World setting context will be added to all API calls, may need further token optimization
-- ⚠️ Known behavior: Choices hidden when dice roll required (by design)
-- 💡 Both AIs return choices properly, but prompts may need refinement for better quality  
+## Session Notes (Latest - Wizard Guidelines Overhaul)
+- ✅ **Step 0 (Theme)**: Added factions (2-4), DM narration rules, removed questions → 7 areas total
+- ✅ **Step 1 (Mechanics)**: XP 76k→15k, fractional combat, fixed HP +6/level, stats +1/level, removed questions
+- ✅ **Step 2 (NPCs)**: Number selection only, AI creates all profiles, concise descriptions, all recruitable/romanceable
+- ✅ **Step 3 (Character)**: Already optimal (hybrid form + point-buy + AI backstory)
+- ✅ **Token Logging**: Detailed breakdown with cache detection (90% discount tracking)
+- ✅ **Prompt Caching**: Automatic, no config needed, 90% discount on repeated input
+- 📋 **Current Priority**: Test wizard end-to-end, then integrate 4 Living Files into game context
+- 💡 **DM Narration Rules** now control gameplay pacing (combat 1 para, conversation 1-2, romance 2-3, max 3)
