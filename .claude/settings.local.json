@@ -6,7 +6,10 @@
       "WebFetch(domain:platform.openai.com)",
       "WebFetch(domain:docs.x.ai)",
       "Bash(awk:*)",
-      "Read(//c//**)"
+      "Read(//c//**)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nRefactor Step 2 NPCs: Simplify to number-only selection with AI auto-generation\n\n- Step 2 form: Removed manual NPC list, now just select count (3-6 NPCs)\n- Removed mature content warning, kept clean info box\n- Updated getStep2InitialMessage() to use npcCount instead of npcList\n- Updated Step 2 guidelines: AI creates complete profiles from scratch\n- sharedChat.js: Now uses getStepXInitialMessage() for all steps\n- aiAssistant.js: Added NPC count context for Step 2\n\nWorkflow: User selects count → AI auto-generates all NPCs + factions → User refines via chat\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
