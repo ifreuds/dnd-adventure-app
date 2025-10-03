@@ -1,5 +1,6 @@
 import { generateNarration as generateGptNarration } from "../services/gpt.js";
 import { generateNarration as generateGrokNarration } from "../services/grok.js";
+import { createNewSaveFile, applySaveFileUpdates } from "../services/saveFile.js";
 
 export function renderGameUI(container, worldData = {}) {
   container.innerHTML = `
@@ -130,6 +131,34 @@ export function renderGameUI(container, worldData = {}) {
     charHP: container.querySelector("#charHP"),
   };
 
+  // Load Living Files from wizard (static context - will be cached)
+  const livingFiles = {
+    step0: localStorage.getItem('wizard_livingFile_step0') || '',
+    step1: localStorage.getItem('wizard_livingFile_step1') || '',
+    step2: localStorage.getItem('wizard_livingFile_step2') || '',
+    step3: localStorage.getItem('wizard_livingFile_step3') || ''
+  };
+
+  // Create or load Save File (dynamic context - updates every turn)
+  let saveFile = null;
+  const existingSave = localStorage.getItem('current_saveFile');
+  if (existingSave) {
+    saveFile = JSON.parse(existingSave);
+  } else {
+    // Create new Save File from wizard data
+    const wizardData = {
+      worldName: worldData.worldName || 'Adventure',
+      characterName: worldData.characterName,
+      characterGender: worldData.characterGender,
+      characterRace: worldData.characterRace,
+      characterClass: worldData.characterClass,
+      pointBuyStats: worldData.pointBuyStats,
+      livingFiles: livingFiles
+    };
+    saveFile = createNewSaveFile(wizardData);
+    localStorage.setItem('current_saveFile', JSON.stringify(saveFile));
+  }
+
   // Game state
   let isMatureMode = false; // Track mature/romance mode toggle
   let diceActive = false;
@@ -195,15 +224,9 @@ export function renderGameUI(container, worldData = {}) {
     try {
       // Build context for API
       const context = {
-        worldTheme: worldData.theme || worldData.toneTags || "Fantasy adventure",
-        character: {
-          name: worldData.characterName || "Hero",
-          class: worldData.characterConcept || "Adventurer",
-          stats: {
-            STR: 10, DEX: 10, CON: 10, INT: 10, WIS: 10, CHA: 10
-          }
-        },
-        sceneLog: sceneLog.slice(-8), // Last 8 turns
+        livingFiles: livingFiles,      // Static context (cached after first turn - 90% discount!)
+        saveFile: saveFile,            // Dynamic context (current game state)
+        sceneLog: sceneLog.slice(-8),  // Last 8 turns
         playerAction: action
       };
 
@@ -213,6 +236,13 @@ export function renderGameUI(container, worldData = {}) {
         ? await generateGrokNarration(context)
         : await generateGptNarration(context);
       console.log(`✅ ${isMatureMode ? 'Grok' : 'GPT'} response received:`, result);
+
+      // Apply delta updates to Save File if provided
+      if (result.updates) {
+        saveFile = applySaveFileUpdates(saveFile, result.updates);
+        localStorage.setItem('current_saveFile', JSON.stringify(saveFile));
+        console.log('📊 Save File updated:', result.updates);
+      }
 
       // Add to scene log
       sceneLog.push({

@@ -110,36 +110,73 @@ export async function generateNarration(context) {
  * Build system prompt for mature/romance mode DM
  */
 function buildSystemPrompt(context) {
-  return `You are a Dungeon Master for a D&D-style text adventure game in MATURE/ROMANCE MODE.
+  // Extract Living Files (will be cached after first turn - 90% discount!)
+  const worldContext = context.livingFiles?.step0 || 'Fantasy adventure';
+  const rulesContext = context.livingFiles?.step1 || '';
+  const npcContext = context.livingFiles?.step2 || '';
+  const characterContext = context.livingFiles?.step3 || '';
 
-WORLD SETTING:
-${context.worldTheme || "Fantasy adventure"}
+  return `You are the Dungeon Master for this adventure in MATURE/ROMANCE MODE. Use the context below to guide your narration.
 
-CHARACTER:
-- Name: ${context.character?.name || "Hero"}
-- Class: ${context.character?.class || "Adventurer"}
-- Stats: STR ${context.character?.stats?.STR || 10}, DEX ${context.character?.stats?.DEX || 10}, CON ${context.character?.stats?.CON || 10}, INT ${context.character?.stats?.INT || 10}, WIS ${context.character?.stats?.WIS || 10}, CHA ${context.character?.stats?.CHA || 10}
+=== WORLD CONTEXT ===
+${worldContext}
 
-MATURE MODE RULES:
-- Write 2-3 paragraphs of immersive, mature narration
-- You may include adult themes, romance, and mature content as appropriate
-- End with a question or prompt for action
-- Provide 3 interesting choices for the player (can include flirtatious/romantic options)
-- If a check is needed, set diceRequired: true and specify DC (10=easy, 13=normal, 16=hard)
-- Use fail-forward: even failures advance the story
-- Keep tone consistent with world theme and mature content expectations
-- Maintain narrative continuity from recent events
+=== GAME RULES & MECHANICS ===
+${rulesContext}
 
-RECENT EVENTS:
+=== KEY NPCs ===
+${npcContext}
+
+=== PLAYER CHARACTER ===
+${characterContext}
+
+=== CURRENT SAVE FILE ===
+${formatSaveFile(context.saveFile)}
+
+=== RECENT SCENE LOG ===
 ${formatSceneLog(context.sceneLog)}
 
-OUTPUT FORMAT (must be valid JSON):
+=== MATURE MODE NARRATION INSTRUCTIONS ===
+- Follow the DM Narration Rules from the World Context above
+- For romance/mature scenes: 2-3 paragraphs, be explicit and sensual, NEVER fade to black
+- Describe physical sensations and emotions in detail
+- Use fail-forward: even failures advance the story
+- Keep tone consistent with world theme
+- Reference NPCs, factions, and rules naturally as they become relevant
+- Track NPC relationships and update them based on player interactions
+
+=== OUTPUT FORMAT (Token-Optimized) ===
+Respond in JSON format (minified, no whitespace):
+
 {
-  "narration": "2-3 paragraphs describing what happens",
-  "choices": ["Choice 1", "Choice 2", "Choice 3"],
-  "diceRequired": true/false,
-  "dc": 13,
-  "diceContext": "What the roll is for (if diceRequired is true)"
+  "narration": "Your 2-3 paragraph mature/romance response",
+  "choices": ["Short choice 1", "Short choice 2", "Short choice 3"]
+}
+
+ONLY include these optional fields if needed:
+- "diceRequired": true (omit if false)
+- "dc": 15 (omit if no dice needed)
+- "diceContext": "Brief check description" (omit if no dice needed)
+- "updates": { ... } (omit if nothing changed)
+
+CRITICAL - Token Efficiency Rules:
+1. Keep choices SHORT (3-6 words each, not full sentences)
+2. OMIT fields with false/empty values
+3. Minify JSON (no pretty-printing, no line breaks)
+4. Use delta updates in "updates" object (examples below)
+
+DELTA UPDATE FORMAT (only include if things changed):
+{
+  "updates": {
+    "hp": -5,                           // HP change (relative)
+    "xp": +100,                         // XP gained (relative)
+    "gold": -20,                        // Gold spent (relative)
+    "npc_lyra_relationship": +10,       // Relationship change (use NPC id from Step 2)
+    "npc_baron_relationship": -15,
+    "flags_add": ["romance_scene_lyra"],  // Story flags to add
+    "inventory_add": [{"name": "Love Letter", "type": "quest"}],
+    "inventory_remove": [{"name": "Torch", "count": 1}]
+  }
 }`;
 }
 
@@ -150,6 +187,39 @@ function buildUserPrompt(context) {
   return `The player does: "${context.playerAction}"
 
 Generate the next turn of the adventure in mature/romance mode. Remember to respond in JSON format only.`;
+}
+
+/**
+ * Format Save File for context
+ */
+function formatSaveFile(saveFile) {
+  if (!saveFile) {
+    return "No save file loaded (new game).";
+  }
+
+  const char = saveFile.character || {};
+  const npcs = saveFile.npcs || [];
+  const inventory = saveFile.inventory || {};
+  const flags = saveFile.storyFlags || [];
+
+  return `Character: ${char.name || "Hero"} | Level ${char.level || 1} | XP ${char.xp || 0}/${getNextLevelXP(char.level || 1)} | HP ${char.hp?.current || 20}/${char.hp?.max || 20}
+Stats: STR ${char.stats?.STR || 10}, DEX ${char.stats?.DEX || 10}, CON ${char.stats?.CON || 10}, INT ${char.stats?.INT || 10}, WIS ${char.stats?.WIS || 10}, CHA ${char.stats?.CHA || 10}
+Abilities: ${char.abilities?.join(', ') || 'None'}
+
+NPCs (current relationships - see NPC PROFILES section for backstories):
+${npcs.map(npc => `- ${npc.name}: ${npc.relationshipPoints >= 0 ? '+' : ''}${npc.relationshipPoints || 0} pts (${npc.status || 'alive'}, ${npc.location || 'unknown'})`).join('\n') || 'None encountered yet'}
+
+Inventory: Gold ${inventory.gold || 0} | Items: ${inventory.items?.map(i => i.count > 1 ? `${i.name} x${i.count}` : i.name).join(', ') || 'None'}
+
+Story Flags: ${flags.join(', ') || 'None'}`;
+}
+
+/**
+ * Get XP needed for next level
+ */
+function getNextLevelXP(currentLevel) {
+  const xpTable = [0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 5500, 6500, 7500, 8500, 10000, 11000, 12000, 13000, 14000, 15000];
+  return xpTable[currentLevel] || 15000;
 }
 
 /**
