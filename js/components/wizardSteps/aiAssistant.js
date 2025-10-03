@@ -86,7 +86,22 @@ IMPORTANT: Create COMPLETE profiles for exactly ${wizardData.npcCount} NPCs. Als
     }
 
     const data = await response.json();
-    console.log(`✅ AI response received (${data.usage?.total_tokens || 'unknown'} tokens)`);
+
+    // Log detailed token usage
+    if (data.usage) {
+      console.log(`✅ AI response received - Token usage:`);
+      console.log(`   📥 Input (prompt): ${data.usage.prompt_tokens} tokens`);
+      console.log(`   📤 Output (completion): ${data.usage.completion_tokens} tokens`);
+      console.log(`   💰 Total: ${data.usage.total_tokens} tokens`);
+
+      // GPT-5-mini specific: reasoning tokens
+      if (data.usage.completion_tokens_details?.reasoning_tokens) {
+        console.log(`   🧠 Reasoning tokens: ${data.usage.completion_tokens_details.reasoning_tokens}`);
+        console.log(`   💬 Actual response tokens: ${data.usage.completion_tokens - data.usage.completion_tokens_details.reasoning_tokens}`);
+      }
+    } else {
+      console.log(`✅ AI response received (token info unavailable)`);
+    }
 
     const messageContent = data.choices[0].message.content;
 
