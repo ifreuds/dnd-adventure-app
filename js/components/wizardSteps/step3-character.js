@@ -11,7 +11,7 @@ export function renderStep3Form(wizardData, el, onComplete) {
   `;
 
   el.inputArea.innerHTML = `
-    <div style="max-height: 600px; overflow-y: auto; padding-right: 10px;">`
+    <div style="max-height: 600px; overflow-y: auto; padding-right: 10px;">
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
       <div>
         <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Name *</label>
