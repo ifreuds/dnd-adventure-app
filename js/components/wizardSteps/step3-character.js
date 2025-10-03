@@ -11,6 +11,7 @@ export function renderStep3Form(wizardData, el, onComplete) {
   `;
 
   el.inputArea.innerHTML = `
+    <div style="max-height: 600px; overflow-y: auto; padding-right: 10px;">`
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
       <div>
         <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Name *</label>
@@ -73,9 +74,10 @@ export function renderStep3Form(wizardData, el, onComplete) {
       </div>
     </div>
 
-    <button id="generateBtn" style="width: 100%; padding: 12px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px;">
+    <button id="generateBtn" style="width: 100%; padding: 12px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 20px;">
       🤖 Generate Character Story & Details
     </button>
+    </div>
   `;
 
   // Initialize point-buy stats if not exists
@@ -161,22 +163,23 @@ export function getStep3InitialMessage(wizardData) {
   const stats = wizardData.pointBuyStats;
   const statSummary = `STR ${stats.STR}, DEX ${stats.DEX}, CON ${stats.CON}, INT ${stats.INT}, WIS ${stats.WIS}, CHA ${stats.CHA}`;
 
-  return `Perfect! I see you've created:
+  return `Create a complete character profile for:
 
-<strong>${wizardData.characterName}</strong> (${wizardData.characterGender})
-${wizardData.characterRace} ${wizardData.characterClass}
+${wizardData.characterName} (${wizardData.characterGender} ${wizardData.characterRace} ${wizardData.characterClass})
 Goal: ${wizardData.characterGoal}
 Base Stats: ${statSummary}
 
-Now let's build the rest! I'll help you create:
-- Backstory and origin
-- Racial stat bonuses (narrative-based)
-- Detailed physical appearance (important for romance!)
-- Personality traits
-- Starting abilities
-- Starting equipment
+Please create:
+- Backstory (2-3 paragraphs based on world context from Step 0)
+- Racial stat bonuses (narrative-based, infer from race and world)
+- Physical appearance (2-3 sentences, brief)
+- Personality traits (5 traits)
+- Starting abilities (2-3 class abilities based on world rules)
+- Starting equipment (based on class and world setting)
+- NPC relationships (3 sentences each, explaining starting relationship points from Step 2)
+- Player starting story (2-3 paragraphs prologue - where/how does the story begin?)
 
-Let's start with your backstory. Tell me about ${wizardData.characterName}'s history - how did they become a ${wizardData.characterClass}? What drives them?`;
+Auto-generate everything based on world context, then ask me to review.`;
 }
 
 export function buildStep3Context(wizardData, userMessage) {
