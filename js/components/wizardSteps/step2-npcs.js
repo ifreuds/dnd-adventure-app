@@ -3,117 +3,52 @@
  */
 
 export function renderStep2Form(wizardData, el, onComplete) {
-  if (!wizardData.npcList) {
-    wizardData.npcList = [{ name: '', role: '', gender: '' }];
-  }
-
   el.convoBody.innerHTML = `
     <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
-      <p style="color: #888; margin-bottom: 15px;">Define the key NPCs for your world. The AI will expand each with detailed physical descriptions, backstory, relationship points, and romance options.</p>
+      <p style="color: #888; margin-bottom: 15px;">The AI will generate complete NPC profiles based on your world's story and theme. Just choose how many key NPCs you want to start with.</p>
     </div>
   `;
 
-  function renderNPCList() {
-    return wizardData.npcList.map((npc, idx) => `
-      <div style="background: #2a2a2a; padding: 12px; border-radius: 4px; margin-bottom: 10px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <strong style="color: #d97706;">NPC ${idx + 1}</strong>
-          ${wizardData.npcList.length > 1 ? `<button class="removeNPC" data-idx="${idx}" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">Remove</button>` : ''}
-        </div>
-        <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 10px;">
-          <input type="text" class="npcName" data-idx="${idx}" value="${npc.name || ''}"
-                 placeholder="Name"
-                 style="padding: 6px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 3px;">
-          <input type="text" class="npcRole" data-idx="${idx}" value="${npc.role || ''}"
-                 placeholder="Role (e.g., Warrior, Merchant)"
-                 style="padding: 6px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 3px;">
-          <select class="npcGender" data-idx="${idx}"
-                  style="padding: 6px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 3px;">
-            <option value="">Gender...</option>
-            <option value="Male" ${npc.gender === 'Male' ? 'selected' : ''}>Male</option>
-            <option value="Female" ${npc.gender === 'Female' ? 'selected' : ''}>Female</option>
-            <option value="Other" ${npc.gender === 'Other' ? 'selected' : ''}>Other</option>
-          </select>
-        </div>
-      </div>
-    `).join('');
-  }
-
   el.inputArea.innerHTML = `
-    <div id="npcListContainer" style="margin-bottom: 15px;">
-      ${renderNPCList()}
-    </div>
+    <div style="display: grid; gap: 15px; margin-bottom: 20px;">
+      <div>
+        <label style="display: block; margin-bottom: 5px; color: #e0e0e0;">Number of Key NPCs *</label>
+        <select id="npcCount" style="width: 100%; padding: 8px; background: #1e1e1e; color: #e0e0e0; border: 1px solid #333; border-radius: 4px;">
+          <option value="">Select...</option>
+          <option value="3" ${wizardData.npcCount === 3 ? 'selected' : ''}>3 NPCs (Minimal)</option>
+          <option value="4" ${wizardData.npcCount === 4 ? 'selected' : ''}>4 NPCs (Balanced)</option>
+          <option value="5" ${wizardData.npcCount === 5 ? 'selected' : ''}>5 NPCs (Recommended)</option>
+          <option value="6" ${wizardData.npcCount === 6 ? 'selected' : ''}>6 NPCs (Rich Cast)</option>
+        </select>
+      </div>
 
-    <button id="addNPCBtn" style="width: 100%; padding: 8px; background: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-bottom: 15px;">
-      + Add Another NPC
-    </button>
+      <div style="background: #2a2a2a; padding: 12px; border-radius: 4px; border-left: 3px solid #8b5cf6;">
+        <p style="color: #e0e0e0; margin: 0; font-size: 13px;">
+          <strong>📝 What the AI will create:</strong> Complete profiles with name, race, role, detailed physical descriptions (for romance), backstory, personality, starting relationship points, romance availability, companion stats, and faction alignment.
+        </p>
+      </div>
 
-    <div style="background: #2a2a2a; padding: 12px; border-radius: 4px; border-left: 3px solid #8b5cf6; margin-bottom: 15px;">
-      <p style="color: #e0e0e0; margin: 0; font-size: 13px;">
-        <strong>⚠️ Romance & Mature Content Notice:</strong> The AI will create DETAILED physical descriptions for romance support. Each NPC will have vivid appearance details including body type, curves, distinctive features, and romantic appeal.
-      </p>
+      <div style="background: #2a2a2a; padding: 12px; border-radius: 4px; border-left: 3px solid #d97706;">
+        <p style="color: #e0e0e0; margin: 0; font-size: 13px;">
+          <strong>⚠️ Romance & Mature Content:</strong> NPCs will have detailed physical descriptions including body type, attractive features, and romantic appeal to support the mature content system.
+        </p>
+      </div>
     </div>
 
     <button id="generateBtn" style="width: 100%; padding: 12px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px;">
-      🤖 Generate Full NPC Profiles
+      🤖 Generate NPCs & Factions
     </button>
   `;
 
-  function attachHandlers() {
-    // Update handlers
-    el.inputArea.querySelectorAll('.npcName').forEach(input => {
-      input.addEventListener('input', (e) => {
-        const idx = parseInt(e.target.getAttribute('data-idx'));
-        wizardData.npcList[idx].name = e.target.value;
-      });
-    });
-
-    el.inputArea.querySelectorAll('.npcRole').forEach(input => {
-      input.addEventListener('input', (e) => {
-        const idx = parseInt(e.target.getAttribute('data-idx'));
-        wizardData.npcList[idx].role = e.target.value;
-      });
-    });
-
-    el.inputArea.querySelectorAll('.npcGender').forEach(select => {
-      select.addEventListener('change', (e) => {
-        const idx = parseInt(e.target.getAttribute('data-idx'));
-        wizardData.npcList[idx].gender = e.target.value;
-      });
-    });
-
-    // Remove handlers
-    el.inputArea.querySelectorAll('.removeNPC').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const idx = parseInt(e.target.getAttribute('data-idx'));
-        wizardData.npcList.splice(idx, 1);
-        el.inputArea.querySelector('#npcListContainer').innerHTML = renderNPCList();
-        attachHandlers();
-      });
-    });
-  }
-
-  attachHandlers();
-
-  // Add NPC button
-  document.getElementById('addNPCBtn').addEventListener('click', () => {
-    wizardData.npcList.push({ name: '', role: '', gender: '' });
-    el.inputArea.querySelector('#npcListContainer').innerHTML = renderNPCList();
-    attachHandlers();
-  });
-
-  // Generate button
   document.getElementById('generateBtn').addEventListener('click', () => {
-    const validNPCs = wizardData.npcList.filter(npc => npc.name && npc.role && npc.gender);
+    const npcCount = parseInt(document.getElementById('npcCount').value);
 
-    if (validNPCs.length === 0) {
-      alert('Please fill out at least one NPC with Name, Role, and Gender.');
+    if (!npcCount) {
+      alert('Please select the number of NPCs.');
       return;
     }
 
-    wizardData.npcList = validNPCs;
-    wizardData.npcCount = validNPCs.length;
-
+    wizardData.npcCount = npcCount;
     onComplete();
   });
 }
