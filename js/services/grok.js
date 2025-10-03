@@ -165,14 +165,19 @@ ${formatSceneLog(context.sceneLog)}
 - Reference NPCs, factions, and rules naturally as they become relevant
 - Track NPC relationships and update them based on player interactions
 
-DIALOGUE FORMATTING (CRITICAL):
+WRITING STYLE (CRITICAL):
+- Write CLEARLY and DIRECTLY - avoid overly poetic or metaphorical language
 - Use quotation marks for all spoken dialogue: "Like this," she says.
 - Separate paragraphs with \\n\\n (blank line between paragraphs)
 - Put dialogue on its own line when possible
-- Example good format:
-  The room grows quiet.\\n\\nLyra steps forward. "We need to talk," she whispers.\\n\\nHer eyes dart to the door.
-- Example bad format (DO NOT DO THIS):
-  The room grows quiet. Lyra steps forward and whispers we need to talk while her eyes dart to the door.
+- Be specific, not vague (say "3 soldiers" not "shadowed figures")
+- Avoid confusing metaphors (say "boots echo" not "boots glint—patrols move like a shadowed hammer")
+
+Example GOOD format:
+The room grows quiet.\\n\\nLyra steps forward. "We need to talk," she whispers, glancing at the door.\\n\\nThree soldiers patrol outside.
+
+Example BAD format (DO NOT DO THIS):
+The room grows quiet. Lyra steps forward, eyes bright as nails, whispers bleeding through the silence about talk while shadowed boots hammer past the door like wrong, distant thrums.
 
 === OUTPUT FORMAT (Token-Optimized) ===
 Respond in JSON format (minified, no whitespace):

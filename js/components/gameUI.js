@@ -247,25 +247,47 @@ export function renderGameUI(container, worldData = {}) {
     }
   }
 
-  function addNarration(text) {
+  function addNarration(text, isPlayerAction = false) {
     const messageDiv = document.createElement("div");
     messageDiv.className = "narration-message";
 
-    // Convert \n\n to actual line breaks for better readability
-    // Split by \n\n and create paragraph elements
-    const paragraphs = text.split(/\n\n+/);
-
-    if (paragraphs.length > 1) {
-      // Multiple paragraphs - create separate paragraph elements
-      messageDiv.innerHTML = paragraphs
-        .map(p => `<p style="margin: 0 0 10px 0; line-height: 1.6;">${escapeHtml(p.trim())}</p>`)
-        .join('');
+    if (isPlayerAction) {
+      // Player action - show as distinct message
+      messageDiv.style.cssText = 'background: #1e3a5f; padding: 10px; margin: 15px 0; border-left: 3px solid #d97706; border-radius: 4px;';
+      messageDiv.innerHTML = `<strong style="color: #d97706;">You:</strong> ${escapeHtml(text)}`;
     } else {
-      // Single paragraph - just set text
-      messageDiv.textContent = text;
+      // DM narration - convert \n\n to paragraphs
+      messageDiv.style.cssText = 'padding: 10px; margin: 15px 0; border-left: 3px solid #333; border-radius: 4px;';
+      const paragraphs = text.split(/\n\n+/);
+
+      if (paragraphs.length > 1) {
+        // Multiple paragraphs - create separate paragraph elements
+        messageDiv.innerHTML = paragraphs
+          .map(p => `<p style="margin: 0 0 10px 0; line-height: 1.6;">${escapeHtml(p.trim())}</p>`)
+          .join('');
+      } else {
+        // Single paragraph - just set text
+        messageDiv.innerHTML = `<p style="margin: 0; line-height: 1.6;">${escapeHtml(text)}</p>`;
+      }
     }
 
     el.chatMessages.appendChild(messageDiv);
+    el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
+  }
+
+  function addDiceResult(roll, dc, success) {
+    const resultDiv = document.createElement("div");
+    resultDiv.style.cssText = `
+      background: ${success ? '#1a4d2e' : '#4d1a1a'};
+      padding: 8px 12px;
+      margin: 10px 0;
+      border-left: 3px solid ${success ? '#4CAF50' : '#ff4444'};
+      border-radius: 4px;
+      font-weight: bold;
+      color: ${success ? '#4CAF50' : '#ff4444'};
+    `;
+    resultDiv.innerHTML = `🎲 Rolled ${roll} vs DC ${dc} — ${success ? 'SUCCESS' : 'FAILURE'}`;
+    el.chatMessages.appendChild(resultDiv);
     el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
   }
 
@@ -290,12 +312,10 @@ export function renderGameUI(container, worldData = {}) {
   }
 
   async function handlePlayerAction(action) {
-    // Add player action to chat
-    const playerDiv = document.createElement("div");
-    playerDiv.className = "player-message";
-    playerDiv.textContent = `> ${action}`;
-    el.chatMessages.appendChild(playerDiv);
-    el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
+    // Add player action to chat (skip for [GAME START])
+    if (!action.startsWith('[GAME START]')) {
+      addNarration(action, true);  // Show as distinct player action
+    }
 
     // Clear input
     el.freeTextInput.value = "";
@@ -515,6 +535,10 @@ export function renderGameUI(container, worldData = {}) {
               : await generateGptNarration(context);
             console.log(`✅ ${isMatureMode ? 'Grok' : 'GPT'} dice outcome received:`, result);
 
+            // Show dice result in chat
+            addDiceResult(finalRoll, dc, success);
+
+            // Then show outcome narration
             addNarration(result.narration);
             renderChoices(result.choices);
 
