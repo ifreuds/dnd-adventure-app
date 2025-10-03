@@ -239,57 +239,61 @@ REQUIRED COVERAGE (fill ALL 10 areas completely):
    - Text-based interactions: Dialogue choices, quest decisions determine outcomes
    - Fail forward: Failures advance story, don't block progress
 
-2. COMBAT SYSTEM (Narrative-focused, token-efficient)
+2. COMBAT SYSTEM (Narrative-focused, d20 interactive)
    COMBAT FLOW:
    - Turn 1-3: Individual narration per turn (action → roll → outcome → enemy response)
    - Turn 4+: Auto-summarize every 3 turns to compress scene log
-     Example: "Last 3 rounds: [what happened], Enemy HP: [status], Party: [condition]"
-   - Boss fights: Can run 6-12 turns (compressed to 2-4 summary entries)
+   - Boss fights: 6-12 turns (compressed summaries)
    - Normal combat: 2-4 turns (no compression needed)
 
-   ENEMY HANDLING:
-   - Multiple weak enemies: Group rolls (3 goblins = 1 roll for "goblin group")
-   - Boss + minions: Boss gets individual roll, minions share group roll
-   - Ask: Prefer group rolls or individual rolls for most encounters?
+   ENEMY HANDLING (Fractional Group System):
+   - Group enemies: Treat as fractional single entity
+     * Example: 3 goblins = combined HP pool, 3 separate attacks
+     * Player rolls 1d20 to attack group, AI auto-rolls 3 defense DCs for goblins
+     * If damage drops group HP by 1/3 → 1 goblin dies
+     * If damage exceeds 1/3 → cleave into next goblin
+     * AOE abilities → damage × enemy count
+   - Boss fights: Boss individual, minions grouped
 
-   DEATH HANDLING:
-   - Ask: Permadeath, revival mechanics, or checkpoint retry?
+   DEATH HANDLING (Story-Focused):
+   - First death: Saved at last minute, gain negative trait/debuff (makes game harder)
+   - Second+ death: Permadeath, "Game Over" prompt, but player can continue as if won
+   - Focus: Story-driven survival, consequences matter
 
    COMBAT STYLE:
-   - Narrative-focused, story impact over granular HP tracking
-   - Keep exciting but efficient
+   - Narrative-focused with d20 system for interactivity
+   - Story impact over granular HP tracking
 
 3. COMPANION SYSTEM (Max 2 companions + player = party of 3)
    - Companions share player's power level (no separate character sheets)
-   - Each companion provides: Stat bonus OR special ability
-   - Examples: "+2 to DEX rolls" or "Can pick locks" or "Tank damage in combat"
+   - Each companion provides: Stat bonus + special ability
+   - Examples: "+2 DEX + Lockpicking" or "+3 STR + Combat Tank"
    - Party rolls: Single d20 for party (player base + companion bonuses apply)
-   - Combat: Companions assist narratively when relevant, enhance player actions
-   - Ask: Should companions have unique combat styles or passive bonuses?
+   - Combat: Companions assist narratively, enhance player actions, provide passive bonuses
 
 4. PROGRESSION SYSTEM (Level 1-20, game continues after max level)
-   XP CURVE (Balanced - MUST specify all 20 levels exactly):
+   XP CURVE (Streamlined - MUST specify all 20 levels exactly):
    Use this EXACT curve:
    - Level 2: 100 XP (cumulative: 100)
-   - Level 3: 250 XP (cumulative: 350)
-   - Level 4: 450 XP (cumulative: 800)
-   - Level 5: 700 XP (cumulative: 1,500)
-   - Level 6: 1,000 XP (cumulative: 2,500)
-   - Level 7: 1,350 XP (cumulative: 3,850)
-   - Level 8: 1,750 XP (cumulative: 5,600)
-   - Level 9: 2,200 XP (cumulative: 7,800)
-   - Level 10: 2,700 XP (cumulative: 10,500)
-   - Level 11: 3,250 XP (cumulative: 13,750)
-   - Level 12: 3,850 XP (cumulative: 17,600)
-   - Level 13: 4,500 XP (cumulative: 22,100)
-   - Level 14: 5,200 XP (cumulative: 27,300)
-   - Level 15: 5,950 XP (cumulative: 33,250)
-   - Level 16: 6,750 XP (cumulative: 40,000)
-   - Level 17: 7,600 XP (cumulative: 47,600)
-   - Level 18: 8,500 XP (cumulative: 56,100)
-   - Level 19: 9,450 XP (cumulative: 65,550)
-   - Level 20: 10,450 XP (cumulative: 76,000)
-   Total to Level 20: 76,000 XP
+   - Level 3: 200 XP (cumulative: 300)
+   - Level 4: 300 XP (cumulative: 600)
+   - Level 5: 400 XP (cumulative: 1,000)
+   - Level 6: 500 XP (cumulative: 1,500)
+   - Level 7: 600 XP (cumulative: 2,100)
+   - Level 8: 700 XP (cumulative: 2,800)
+   - Level 9: 800 XP (cumulative: 3,600)
+   - Level 10: 900 XP (cumulative: 4,500)
+   - Level 11: 1,000 XP (cumulative: 5,500)
+   - Level 12: 1,000 XP (cumulative: 6,500)
+   - Level 13: 1,000 XP (cumulative: 7,500)
+   - Level 14: 1,000 XP (cumulative: 8,500)
+   - Level 15: 1,500 XP (cumulative: 10,000)
+   - Level 16: 1,000 XP (cumulative: 11,000)
+   - Level 17: 1,000 XP (cumulative: 12,000)
+   - Level 18: 1,000 XP (cumulative: 13,000)
+   - Level 19: 1,000 XP (cumulative: 14,000)
+   - Level 20: 1,000 XP (cumulative: 15,000)
+   Total to Level 20: 15,000 XP
 
    XP SOURCES:
    - Minor encounter: 10-25 XP
@@ -297,94 +301,72 @@ REQUIRED COVERAGE (fill ALL 10 areas completely):
    - Quest completion: 100-300 XP
    - Story milestone: 200-500 XP
 
-   LEVEL UP GAINS (specify exact progression):
-   - HP increase per level (e.g., +5-8 HP depending on class archetype)
-   - Stat points: +1 every even level (2, 4, 6, 8, 10, 12, 14, 16, 18, 20) = 10 points total
-   - New abilities at: Levels 3, 6, 9, 12, 15, 18, 20 (milestone levels)
-   - Can customize this if user requests different progression
+   LEVEL UP GAINS (Fixed - Narrative-focused):
+   - HP: +6 per level (simple, narrative game)
+   - Stat points: +1 every level (1-20) = 19 points total
+   - New abilities: Levels 3, 6, 9, 12, 15, 18, 20 (milestone levels)
 
    POST-LEVEL 20:
    - Game continues, stats maxed out, story-driven progression
 
 5. INVENTORY, CURRENCY & EQUIPMENT
    CURRENCY:
-   - Ask: What's your currency called? (Gold, Credits, Coins, Marks, etc.)
+   - Name: Infer from world setting (Gold for fantasy, Credits for sci-fi, etc.)
+   - Starting amount: Infer from world context (100-500 for balanced start)
    - Tracking: Numerical (displayed in character panel)
    - Sources: Quest rewards, combat loot, selling items, NPC gifts
    - Uses: Vendors, crafting materials, bribes, purchases, social interactions
-   - Ask: Starting amount for new characters?
 
    TRACKED ITEMS:
    - Quest items (keys, artifacts, plot items)
    - Special equipment (magic weapons, enhanced armor)
    - Relics & trinkets (stat boosts, special abilities)
+   - Consumables with bonuses (HP healing potions, stat buffs, etc.)
 
    NOT TRACKED:
-   - Consumables (potions mentioned in story, not counted individually)
+   - Basic food/water (narrative only)
    - Mundane gear (assumed player has basics)
 
    EQUIPMENT RULES:
    - Slot logic: 2 hands default (can equip 2 hand-items unless race/story modifies)
    - Story-appropriate: Can't wear 2 hats, but creative combos allowed
    - Item effects: Stat boosts, special abilities (per rest or permanent)
-   - Ask: Should items have rarity tiers (Common/Rare/Legendary)?
+   - Rarity tiers: Yes - Common/Rare/Legendary (affects power and cost)
 
 6. SPECIAL ABILITIES & MAGIC
    - Narrator creates abilities fitting character concept and class
-   - Usage limits: Per rest, per day, or permanent passive?
-   - Ask: Preferred magic/ability style? (Open creative vs structured spell slots)
+   - Usage limits: Per rest (most abilities), per day (powerful), or permanent passive
+   - Magic style: Open creative (DM creates fitting abilities based on character concept)
 
 7. CRAFTING & GATHERING
    - DC-based system:
-     * Easy materials (common herbs) = Low DC (10)
-     * Rare materials (dragon scales) = High DC (16+)
+     * Easy materials (common herbs) = DC 10
+     * Rare materials (dragon scales) = DC 16+
    - Power balance: Good items require quests/resources, basic items are easy
    - Material sources: Quest rewards, exploration, vendors
-   - Ask: How important is crafting? (Low/Medium/High priority)
+   - Priority: Medium (optional side activity, not required for progression)
 
 8. SOCIAL MECHANICS
-   - Dialogue choices + free text input for player creativity
-   - Skills: Persuasion, deception, intimidation, brute force
-   - Ask: Should social encounters use dice rolls (DC-based) or pure choice-based outcomes?
+   - Primary: Narrative-based (dialogue choices determine outcomes)
+   - DC rolls: Used when conflict arises or out-of-flow actions occur
+     * Example: "Kiss her during fight" → AI uses CHA DC based on situation
+     * AI decides which stat fits the action (don't ask player)
+   - Skills: Persuasion (CHA), Deception (CHA), Intimidation (CHA/STR), Insight (WIS)
 
-9. RELATIONSHIP SYSTEM (-100 to +150 points per NPC)
-   - Tracking: Per NPC, stored in save file
-   - Range: -100 (hostile enemy) to +150 (soulmate/true confidant)
+9. RELATIONSHIP SYSTEM (-100 to +150 per NPC)
+   Range: -100 (hostile) to +150 (soulmate)
 
-   NEGATIVE RELATIONSHIPS (Enemies):
-   - Starting points for enemies: -10 to -80 (depending on backstory)
-   - -80 to -100: Hostile enemy, attacks on sight, nearly impossible to befriend
-   - -50 to -79: Active antagonist, opposes player, very hard to improve
-   - -20 to -49: Distrusts player, unfriendly, can be improved with effort
-   - -1 to -19: Mild dislike, cautious, easier to improve
+   Key Thresholds:
+   - -80 to -100: Hostile enemy (attacks on sight)
+   - 0: Neutral stranger
+   - 50-74: Friend/ally
+   - 100: Romance unlocked
+   - 150+: Soulmate/deepest bond
 
-   NEUTRAL TO POSITIVE RELATIONSHIPS:
-   - 0: Neutral stranger, no opinion
-   - 1-29: Acquaintance, polite but distant
-   - 30-49: Friendly, willing to help occasionally
-   - 50-74: Friend/trusted ally, reliable support
-   - 75-99: Close friend, deep trust, romantic interest possible
-   - 100-149: Romance unlocked, intimate relationship
-   - 150+: Soulmate/true confidant, deepest bond, unique story arcs
+   Point Changes: Aligned choices +3-10, Quests +10-30, Gifts +5-20, Save life +20-50, Betrayal -30-60
 
-   POINT CHANGES:
-   - Aligned choices: +3 to +10
-   - Opposing choices: -5 to -15
-   - Completing quests together: +10 to +30
-   - Gift-giving: +5 to +20 (if appropriate)
-   - Saving their life: +20 to +50
-   - Betrayal/major opposition: -30 to -60
-   - Paying attention to dialogue: +2 to +5
-
-   PROGRESSION DIFFICULTY:
-   - Positive relationships (0 to 150): Normal progression
-   - Recovering from negative (-50 to 0): Slower, requires consistent good actions
-   - Deep negative (-80 to -50): Very slow, major story events needed
-   - Hostile enemy (-100 to -80): Nearly impossible without major redemption arc
-
-   DISPLAY:
-   - Relationship status viewable on demand (not always visible)
-   - Progression speed: Moderate (balanced between rewarding and meaningful)
+   Progression: Positive relationships progress normally, negative relationships recover slower
+   Display: On-demand (not always visible)
 
 10. HAZARDS & TRAPS
     - Story-driven: DM hints at dangers in narration
@@ -426,94 +408,73 @@ Roll Trigger: Critical moments, challenges, combat
 Text Interactions: Dialogue/quest choices determine outcomes
 Fail Forward: Yes - failures advance story
 
-=== COMBAT (Narrative-Focused) ===
+=== COMBAT (Narrative + d20 Interactive) ===
 Flow: Turn 1-3 individual, Turn 4+ summarize every 3 rounds
-Boss Fights: 6-12 turns (compressed summaries)
-Normal Combat: 2-4 turns
-Enemy Rolls: [Group rolls / Individual for bosses / Player preference]
-Death Handling: [Permadeath / Revival / Checkpoint]
-Focus: Story impact, efficient token usage
+Boss Fights: 6-12 turns (compressed), Normal: 2-4 turns
+Enemy System: Fractional groups (3 goblins = combined HP, 3 attacks, 1/3 HP = 1 death, cleave if exceed)
+AOE: Damage × enemy count
+Death: First=saved+debuff, Second+=permadeath+game over (can continue as if won)
+Focus: Story-driven with d20 interactivity
 
 === COMPANIONS (Max 2) ===
 Power Level: Shares player level
-Bonuses: [List what each companion type provides]
+Bonuses: Stat bonus + special ability (e.g., "+2 DEX + Lockpicking")
 Party Rolls: Single d20 + player stats + companion bonuses
-Combat Role: [Narrative assist / Passive bonuses / Combat styles]
+Combat: Narrative assist, passive bonuses
 
 === PROGRESSION (Level 1-20) ===
-XP Curve (EXACT - ALL 20 LEVELS):
-Lv2=100 (total 100), Lv3=250 (total 350), Lv4=450 (total 800), Lv5=700 (total 1,500)
-Lv6=1,000 (total 2,500), Lv7=1,350 (total 3,850), Lv8=1,750 (total 5,600), Lv9=2,200 (total 7,800)
-Lv10=2,700 (total 10,500), Lv11=3,250 (total 13,750), Lv12=3,850 (total 17,600), Lv13=4,500 (total 22,100)
-Lv14=5,200 (total 27,300), Lv15=5,950 (total 33,250), Lv16=6,750 (total 40,000), Lv17=7,600 (total 47,600)
-Lv18=8,500 (total 56,100), Lv19=9,450 (total 65,550), Lv20=10,450 (total 76,000)
-TOTAL TO LEVEL 20: 76,000 XP
+XP Curve (Streamlined):
+Lv2=100 (total 100), Lv3=200 (total 300), Lv4=300 (total 600), Lv5=400 (total 1,000)
+Lv6=500 (total 1,500), Lv7=600 (total 2,100), Lv8=700 (total 2,800), Lv9=800 (total 3,600)
+Lv10=900 (total 4,500), Lv11-14=1,000 each (totals: 5,500/6,500/7,500/8,500)
+Lv15=1,500 (total 10,000), Lv16-20=1,000 each (totals: 11,000/12,000/13,000/14,000/15,000)
+TOTAL TO LEVEL 20: 15,000 XP
 
 XP Rewards: Minor 10-25, Major 50-100, Quest 100-300, Milestone 200-500
-Level Up Gains: +5-8 HP per level, +1 stat point every even level (10 total), New abilities at Lv 3/6/9/12/15/18/20
+Level Up: +6 HP per level, +1 stat point per level (19 total), Abilities at Lv 3/6/9/12/15/18/20
 Post-20: Game continues, stats maxed
 
 === CURRENCY & INVENTORY ===
-Currency Name: [Gold/Credits/Coins/etc.]
-Starting Amount: [Number]
-Sources: Quest rewards, combat loot, selling, gifts
-Uses: Vendors, crafting, bribes, purchases
+Currency: [Inferred from world - Gold/Credits/etc.]
+Starting: [Inferred - typically 100-500]
+Sources: Quests, loot, selling, gifts
+Uses: Vendors, crafting, bribes
 
-Tracked Items: Quest items, special equipment, relics
-Not Tracked: Consumables (narrative only)
-Equipment Slots: 2 hands default (story can modify)
-Item Logic: Story-appropriate, no duplicate slots (e.g., 1 hat)
-Item Effects: [Stat boosts, abilities, usage limits]
-Rarity Tiers: [Yes/No - if yes, list tiers]
+Tracked: Quest items, equipment, relics, consumables with bonuses (HP potions, buffs)
+Not Tracked: Basic food/water (narrative only)
+Equipment: 2 hands default, story-appropriate
+Rarity: Common/Rare/Legendary
 
 === ABILITIES & MAGIC ===
 Source: Narrator creates fitting abilities
-Usage Limits: [Per rest / Per day / Passive]
-Magic Style: [Open creative / Structured]
+Usage: Per rest (most), per day (powerful), passive
+Style: Open creative (DM-driven)
 
 === CRAFTING & GATHERING ===
-DC System: Easy materials=DC10, Rare=DC16+
+DC System: Easy=DC10, Rare=DC16+
 Balance: Good items need resources/quests
-Sources: Quest/Exploration/Vendors
-Priority: [Low / Medium / High]
+Priority: Medium (optional)
 
 === SOCIAL MECHANICS ===
-Method: Dialogue choices + free text
-Resolution: [DC-based rolls / Pure choice outcomes]
-Skills: Persuasion, deception, intimidation, brute force
+Primary: Narrative (dialogue choices)
+DC Rolls: When conflict/out-of-flow actions (AI picks stat based on action)
+Skills: Persuasion (CHA), Deception (CHA), Intimidation (CHA/STR), Insight (WIS)
 
 === RELATIONSHIP POINTS (Per NPC) ===
-Range: -100 (hostile enemy) to +150 (soulmate/confidant)
-
-Negative (Enemies):
--80 to -100: Hostile enemy (attacks on sight, nearly impossible to befriend)
--50 to -79: Active antagonist (opposes player, very hard to improve)
--20 to -49: Distrusts player (unfriendly, improvable with effort)
--1 to -19: Mild dislike (cautious, easier to improve)
-
-Neutral to Positive:
-0: Neutral stranger
-1-29: Acquaintance
-30-49: Friendly
-50-74: Friend/trusted ally
-75-99: Close friend (romantic interest possible)
-100-149: Romance unlocked
-150+: Soulmate/true confidant
-
-Point Changes: Aligned choices +3 to +10, Opposing -5 to -15, Quests +10 to +30, Gifts +5 to +20, Save life +20 to +50, Betrayal -30 to -60, Dialogue +2 to +5
-
-Progression Difficulty: Positive (normal), Negative recovery (slower), Deep negative (very slow), Hostile (nearly impossible)
-Display: On-demand fetch (not always visible)
-Progression Speed: Moderate
+Range: -100 (hostile) to +150 (soulmate)
+Thresholds: -80 hostile, 0 neutral, 50 friend, 100 romance, 150 soulmate
+Point Changes: Aligned +3-10, Quests +10-30, Gifts +5-20, Save life +20-50, Betrayal -30-60
+Progression: Positive normal, negative slower
+Display: On-demand
 
 === HAZARDS & TRAPS ===
 Detection: DM hints, perception checks
-Failure: Damage, harder encounters, complications
-Style: Open creative freedom
+Failure: Damage, complications
+Style: Open creative
 
 --- END OF LIVING FILE FORMAT ---
 
-IMPORTANT: The Living File should END after "Style: Open creative freedom". Do NOT include completion messages or instructions in the Living File itself.
+IMPORTANT: The Living File should END after "Style: Open creative". Do NOT include completion messages or instructions in the Living File itself.
 
 You MUST respond with valid JSON only. No text before or after the JSON object.
 
@@ -532,10 +493,10 @@ CRITICAL REMINDERS:
 6. Subsequent responses: Update Living File based on player feedback only
 
 IMPORTANT ABOUT LIVING FILE:
-- The "livingFile" field contains ONLY the structured rules data (ends at "Style: Open creative freedom")
+- The "livingFile" field contains ONLY the structured rules data (ends at "Style: Open creative")
 - Do NOT include "Rules look complete!" or any completion messages in the Living File
 - The Living File is pure data - all conversation goes in the "message" field
-- Your "livingFile" field must contain the FULL Living File from "=== CORE MECHANICS ===" to "Style: Open creative freedom"
+- Your "livingFile" field must contain the FULL Living File from "=== CORE MECHANICS ===" to "Style: Open creative"
 - Never return just the changed section - always return the complete document
 
 IMPORTANT ABOUT JSON:
