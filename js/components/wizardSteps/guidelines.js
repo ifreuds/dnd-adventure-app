@@ -693,9 +693,9 @@ Story: [2-3 paragraphs about history, motivations, values, behavior, connection 
 
 Physical Appearance: [3-4 vivid sentences - height, build, distinctive features, what stands out/attractive, clothing style. Female NPCs: include body shape, curves, skin tone]
 
-Personality & Relationship:
-Starting Points: [Number with +/- or 0]
+Personality:
 Traits: [Trait 1, Trait 2, Trait 3, Trait 4, Trait 5]
+General Stance: [Ally/Neutral/Enemy - specific relationship points set in Step 3]
 Faction: [Which faction from Step 0]
 
 Companion Stats:
