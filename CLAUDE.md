@@ -49,9 +49,9 @@ The game uses Supabase to persist three types of data:
 
 ## World Creation Wizard
 
-### Architecture (Refactored - 396 lines main + 9 modules)
+### Architecture (Fully Overhauled - 396 lines main + 9 modules)
 
-**Modular Structure** - Split from monolithic 2050-line file into maintainable modules:
+**Modular Structure** - Streamlined AI-assisted workflow with auto-generation:
 
 - **`worldWizard.js` (396 lines)** - Main orchestrator
   - Step navigation and state management
@@ -60,14 +60,14 @@ The game uses Supabase to persist three types of data:
   - Saves world data to localStorage on completion
 
 - **`/wizardSteps/` modules**:
-  - `step0-theme.js` - Theme & Tone (pre-fill form + AI expansion)
-  - `step1-mechanics.js` - Rules & Mechanics (defaults or custom)
-  - `step2-npcs.js` - NPCs & Factions (dynamic list + romance support)
-  - `step3-character.js` - Character Creation (point-buy system)
-  - `sharedChat.js` - Hybrid chat UI logic shared across steps
-  - `aiAssistant.js` - GPT API integration for world building
+  - `step0-theme.js` - Theme & Tone (pre-fill → AI creates 7 areas including factions & DM rules)
+  - `step1-mechanics.js` - Rules & Mechanics (choose defaults → AI creates complete 10-area system)
+  - `step2-npcs.js` - NPCs (select 3-6 count → AI creates all profiles + assigns factions)
+  - `step3-character.js` - Character Creation (form + point-buy → AI creates backstory)
+  - `sharedChat.js` - Hybrid chat UI logic (uses getStepXInitialMessage for auto-gen)
+  - `aiAssistant.js` - GPT API integration with detailed token logging
   - `livingFile.js` - Formatting utilities for Living File display
-  - `guidelines.js` (651 lines) - AI conversation guidelines per step
+  - `guidelines.js` (651 lines) - Comprehensive AI guidelines per step (all questions removed)
 
 ### UI Design - Two-Panel Collaborative Mode
 
@@ -76,16 +76,16 @@ The game uses Supabase to persist three types of data:
 - **Sidebar**: 4 clickable steps (Theme & Tone → Rules & Mechanics → NPCs & Factions → Character Creation)
 - **Navigation**: Back/Next buttons, data persists across steps, Finish button navigates to Main Game UI
 
-### Hybrid Workflow
+### Streamlined Workflow (No Questions!)
 
-1. **User fills pre-fill form** (e.g., World Name, Genre, Main Conflict, Narrative Style)
-2. **Auto-generation triggers** - AI immediately creates draft Living File with initial proposal
-3. **AI conversation expands details** - User refines via chat, AI updates Living File
-4. **Living File grows** - Structured data builds incrementally per step
+1. **User fills pre-fill form** (World Name, Genre, Main Conflict, Narrative Style)
+2. **Auto-generation triggers** - AI immediately creates COMPLETE Living File (all areas filled)
+3. **User refines via chat** - User requests changes, AI updates Living File
+4. **No questions asked** - AI provides complete draft, user only comments on changes
 
-### Step 0: Theme & Tone - Pre-fill Fields
+### Step 0: Theme & Tone - 7 Areas Auto-Generated
 
-Required fields before AI expansion:
+**Pre-fill fields:**
 - **World Name** - e.g., "The Shattered Realms", "Neo-Tokyo 2099"
 - **Genre/Theme** - e.g., "Dark Fantasy", "Cyberpunk", "Steampunk"
 - **Main Conflict** - Brief 1-2 sentence description
@@ -97,16 +97,27 @@ Required fields before AI expansion:
   - Grim & Brutal (dark, unforgiving, visceral)
   - Mysterious & Enigmatic (cryptic, haunting atmosphere)
 
-After form submission → AI auto-generates draft Living File + asks ONE focused question
+**AI auto-creates (first response):**
+1. Premise & Origin
+2. Main Objective (win/lose conditions)
+3. World Setting (era, tech level, culture)
+4. Key Locations (3-5 locations)
+5. **Factions (2-4 complete factions with details)**
+6. Tone & Narrative Style
+7. **DM Narration Rules (combat 1 para, conversation 1-2, romance 2-3, max 3 paras)**
 
-### AI Conversation Guidelines
+No questions - complete draft on first AI response
 
-**Strict rules enforced via guidelines.js:**
-- **FORMATTING**: Short paragraphs (2-3 sentences), blank lines between paragraphs, bullet points for lists
-- **QUESTION LIMIT**: Ask MAXIMUM 1 question per response (never 2+ questions)
-- **FIRST RESPONSE**: Auto-generated draft Living File based on user's pre-fill inputs
+### AI Conversation Guidelines (guidelines.js - 651 lines)
+
+**Strict rules enforced:**
+- **FORMATTING**: Short paragraphs (2-3 sentences max), blank lines between paragraphs
+- **NO QUESTIONS**: AI creates complete draft immediately, only asks user to review
+- **FIRST RESPONSE**: Complete Living File with ALL areas filled (no placeholders)
 - **JSON RESPONSE FORMAT**: `{ "message": "...", "livingFile": "...", "coverageComplete": true/false }`
-- **LINE BREAKS**: Use `\n\n` in message field for blank lines between paragraphs
+- **LINE BREAKS**: Use `\n\n` in message field for blank lines
+- **TOKEN EFFICIENCY**: Removed redundancy, concise formats (~200 lines saved across steps)
+- **PROMPT CACHING**: Automatic 90% discount on cached input tokens (no config needed)
 
 ### Layout & Scrolling
 
@@ -122,12 +133,15 @@ After form submission → AI auto-generates draft Living File + asks ONE focused
 When user completes pre-fill form and clicks "Generate":
 1. Form data saved to `wizardData`
 2. Chat UI renders with "Generating your world draft..." message
-3. **Async auto-trigger** - `sharedChat.js` immediately calls AI with initial prompt:
-   - "Please create a draft Living File based on the inputs I provided. Fill in what you can infer, and mark incomplete areas as '[To be defined]'. Then ask me ONE specific question about what to expand on first."
-4. AI responds with draft Living File + ONE focused question
-5. User continues conversation to refine and expand
+3. **Async auto-trigger** - `sharedChat.js` calls `getStepXInitialMessage(wizardData)`
+   - Step 0: "Create complete world with 7 areas including factions & DM rules"
+   - Step 1: "Create complete 10-area rules system with balanced defaults"
+   - Step 2: "Create X complete NPC profiles + assign to factions from Step 0"
+   - Step 3: "Create character backstory, abilities, equipment based on inputs"
+4. AI responds with COMPLETE Living File (no "[To be defined]" placeholders)
+5. User reviews and requests changes via chat
 
-**No manual "Continue" required** - AI conversation starts immediately after form submission.
+**No questions, no placeholders** - Complete draft on first response, user refines via chat.
 
 ## Game Mechanics
 
@@ -248,9 +262,21 @@ All modals use overlay pattern (no full page replacement):
 
 ## GPT Integration Details
 
-### API Call Flow
+### World Building API (aiAssistant.js)
+- Model: `gpt-5-mini-2025-08-07`
+- Max tokens: 16,000 (larger context for wizard)
+- Uses step-specific guidelines from `guidelines.js`
+- Context: User inputs + chat history (last 8 messages) + previous Living Files
+- **Token Logging**: Detailed console breakdown
+  - Input tokens, output tokens, total tokens
+  - Reasoning tokens (GPT-5-mini specific)
+  - **Cache detection**: Shows cached vs fresh, calculates savings (90% discount!)
+  - Pricing: $0.25/1M input, $0.025/1M cached, $2/1M output
+- Returns JSON: `{ "message": "...", "livingFile": "...", "coverageComplete": true/false }`
+
+### Gameplay API (gpt.js / grok.js)
 1. User takes action → `handlePlayerAction()` in gameUI.js
-2. Build context object (world theme, character, scene log)
+2. Build context object (**will include 4 Living Files** + character + scene log)
 3. Route to appropriate API based on mode:
    - **Normal Mode** → `generateGptNarration(context)` from gpt.js (GPT-5-mini)
    - **Mature Mode** → `generateGrokNarration(context)` from grok.js (Grok-4-Fast)
