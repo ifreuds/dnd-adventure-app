@@ -615,13 +615,9 @@ REQUIRED COVERAGE (create complete profiles immediately):
       - For female NPCs: Include more detail on body shape, curves, skin tone
       - Focus on what makes them memorable and visually unique
 
-   D. PERSONALITY & RELATIONSHIP
-      - Starting Relationship Points:
-        * Allies/Friends: +20 to +50
-        * Neutral: 0 (strangers, acquaintances)
-        * Rivals: -10 to -30
-        * Enemies: -40 to -80
+   D. PERSONALITY
       - Personality Traits: 3-5 key traits (loyal, stubborn, flirtatious, cold, compassionate, etc.)
+      - General stance: Ally, Neutral, or Enemy (relationship points determined in Step 3 with player context)
 
       NOTE: All NPCs are romanceable (including enemies). Relationship mechanics defined in Step 1.
 
@@ -883,15 +879,15 @@ Personal Goal: [From player input]
 
 Backstory: [2-3 paragraphs based on player inputs and world context]
 
-Base Stats (Point-Buy):
-STR: [Player assigned] → [After racial bonus] (modifier: [+X])
-DEX: [Player assigned] → [After racial bonus] (modifier: [+X])
-CON: [Player assigned] → [After racial bonus] (modifier: [+X])
-INT: [Player assigned] → [After racial bonus] (modifier: [+X])
-WIS: [Player assigned] → [After racial bonus] (modifier: [+X])
-CHA: [Player assigned] → [After racial bonus] (modifier: [+X])
-
-Racial Bonuses: [e.g., "+2 DEX, +1 CHA (Elven agility and grace)"]
+Base Stats (Point-Buy): STR [X], DEX [X], CON [X], INT [X], WIS [X], CHA [X]
+Racial Bonuses: [e.g., "+2 CHA, +1 CON (Human leadership and stamina)"]
+Final Stats (with modifiers for rolls):
+STR: [Final] (+[mod])
+DEX: [Final] (+[mod])
+CON: [Final] (+[mod])
+INT: [Final] (+[mod])
+WIS: [Final] (+[mod])
+CHA: [Final] (+[mod])
 
 Physical Appearance: [2-3 sentences - height, build, hair, eyes, distinctive features]
 
@@ -914,10 +910,12 @@ Starting Equipment:
 - [Armor/clothing]
 
 === NPC RELATIONSHIPS ===
-[NPC Name 1] (Starting Points: [+/-X]):
-[3 sentences explaining why this relationship exists and the history between them]
+Note: Determine points based on player's backstory and NPC's general stance from Step 2
 
-[NPC Name 2] (Starting Points: [+/-X]):
+[NPC Name 1] - [NPC stance from Step 2: Ally/Neutral/Enemy] (Starting Points: [+/-X]):
+[3 sentences explaining why this relationship exists and the history between them based on player's backstory]
+
+[NPC Name 2] - [Stance] (Starting Points: [+/-X]):
 [3 sentences explaining the connection]
 
 [Repeat for all key NPCs from Step 2]
@@ -933,10 +931,11 @@ Starting Equipment:
 1. AUTO-GENERATE everything - no "[To be defined]" or asking questions
 2. Use world context from Step 0, rules from Step 1, NPCs from Step 2
 3. Physical description: BRIEF (2-3 sentences), less detailed than NPCs
-4. NPC relationships: 3 sentences each explaining the connection
-5. Starting story: 2-3 paragraphs setting up the prologue
-6. Keep conversation SHORT - just ask to review, don't explain everything
-7. Professional world-building mode, not dramatic DM voice
+4. Stats format: Base stats → Racial bonuses → Final stats with modifiers
+5. NPC relationships: DETERMINE points based on player backstory (use NPC stance as guide), write 3 sentences explaining
+6. Starting story: 2-3 paragraphs setting up the prologue
+7. Keep conversation SHORT - just ask to review, don't explain everything
+8. Professional world-building mode, not dramatic DM voice
 
 Respond in JSON format:
 {
