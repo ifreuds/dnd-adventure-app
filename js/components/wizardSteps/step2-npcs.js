@@ -24,13 +24,7 @@ export function renderStep2Form(wizardData, el, onComplete) {
 
       <div style="background: #2a2a2a; padding: 12px; border-radius: 4px; border-left: 3px solid #8b5cf6;">
         <p style="color: #e0e0e0; margin: 0; font-size: 13px;">
-          <strong>📝 What the AI will create:</strong> Complete profiles with name, race, role, detailed physical descriptions (for romance), backstory, personality, starting relationship points, romance availability, companion stats, and faction alignment.
-        </p>
-      </div>
-
-      <div style="background: #2a2a2a; padding: 12px; border-radius: 4px; border-left: 3px solid #d97706;">
-        <p style="color: #e0e0e0; margin: 0; font-size: 13px;">
-          <strong>⚠️ Romance & Mature Content:</strong> NPCs will have detailed physical descriptions including body type, attractive features, and romantic appeal to support the mature content system.
+          <strong>📝 What the AI will create:</strong> Complete NPC profiles with name, race, role, detailed physical descriptions, backstory, personality, starting relationship points, romance availability, companion stats (if recruitable), and faction alignment.
         </p>
       </div>
     </div>
@@ -54,59 +48,28 @@ export function renderStep2Form(wizardData, el, onComplete) {
 }
 
 export function getStep2InitialMessage(wizardData) {
-  const npcListSummary = wizardData.npcList.map((npc, idx) =>
-    `${idx + 1}. ${npc.name} (${npc.gender} ${npc.role})`
-  ).join('\n');
+  return `I've selected ${wizardData.npcCount} key NPCs to create.
 
-  return `Great! You've created ${wizardData.npcCount} key NPC${wizardData.npcCount > 1 ? 's' : ''}:
+Please create COMPLETE profiles for ${wizardData.npcCount} NPCs based on the world context from Step 0 and the mechanics from Step 1.
 
-${npcListSummary}
+For each NPC, create:
+- Name, race, role, and origin
+- Detailed backstory and personality
+- Complete physical description (height, build, distinctive features, clothing style)
+- Starting relationship points (allies/friends start positive, neutral at 0, rivals/enemies start negative)
+- Romance availability (yes/no)
+- Companion stats if recruitable (stat bonuses and special abilities)
+- Faction alignment
 
-Now I'll help you build complete profiles for each! For every NPC, I'll create:
-
-<strong>📖 Story & Background</strong>
-- Name, race, origin, beliefs/values, behavior
-- Role in the world, faction alignment
-- Starting relationship points (allies +20-50, neutral 0, rivals/enemies negative)
-
-<strong>💪 Companion Stats (if applicable)</strong>
-- Special abilities if they join the party
-- Stat bonuses they provide (matching their story)
-
-<strong>💜 Physical Appearance (DETAILED for Romance)</strong>
-- Height, build, hair, eyes, face
-- Body type, curves, distinctive features
-- Romantic/attractive characteristics
-- Clothing and style
-
-<strong>❤️ Romance Availability</strong>
-- Can they be romanced? (Yes/No)
-- If yes: Romantic preferences, personality in relationships
-
-Let's start! Tell me more about the first NPC (${wizardData.npcList[0].name}), or I can expand them all based on your world context. What would you like?`;
+Make them diverse, interesting, and appropriate for the world's theme and tone. Then ask me to review and let you know if I want to change anything.`;
 }
 
 export function buildStep2Context(wizardData, userMessage) {
-  const npcListContext = wizardData.npcList.map((npc, idx) =>
-    `${idx + 1}. ${npc.name} - ${npc.gender} ${npc.role}`
-  ).join('\n');
-
-  const npcContext = `
-NPC INPUT (${wizardData.npcCount} NPCs):
-${npcListContext}
-
-IMPORTANT REQUIREMENTS:
-- Create DETAILED physical descriptions for romance support
-- Include: height, build, body type, curves, distinctive features, romantic appeal
-- Specify starting relationship points (allies +20-50, neutral 0, enemies negative)
-- Mark if romanceable (yes/no)
-- Add companion stats/bonuses if applicable
-
-Reference the world context and mechanics from previous steps.`;
-
-  return npcContext + '\n\n' + userMessage;
+  // Context is already passed in aiAssistant.js system prompt
+  // Just return the user message as-is to avoid redundancy
+  return userMessage;
 }
 
 export function isStep2Complete(wizardData) {
-  return wizardData.npcList && wizardData.npcList.length > 0 && wizardData.npcCount;
+  return wizardData.npcCount && wizardData.npcCount >= 3;
 }

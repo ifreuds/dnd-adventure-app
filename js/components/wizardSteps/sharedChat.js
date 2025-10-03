@@ -155,17 +155,20 @@ export function renderHybridChat(currentStep, stepKey, config, wizardData, guide
 
   // Auto-generate first response if chat is empty
   if (chatHistory.length === 0) {
-    // Build initial context message
-    let initialPrompt = "Please create a draft Living File based on the inputs I provided. Fill in what you can infer, and mark incomplete areas as '[To be defined]'. Then ask me ONE specific question about what to expand on first.";
+    // Use step-specific initial message functions
+    let initialPrompt = '';
 
-    if (stepModule.buildStep0Context) {
-      initialPrompt = stepModule.buildStep0Context(wizardData, initialPrompt);
-    } else if (stepModule.buildStep1Context) {
-      initialPrompt = stepModule.buildStep1Context(wizardData, initialPrompt);
-    } else if (stepModule.buildStep2Context) {
-      initialPrompt = stepModule.buildStep2Context(wizardData, initialPrompt);
-    } else if (stepModule.buildStep3Context) {
-      initialPrompt = stepModule.buildStep3Context(wizardData, initialPrompt);
+    if (stepModule.getStep0InitialMessage) {
+      initialPrompt = stepModule.getStep0InitialMessage(wizardData);
+    } else if (stepModule.getStep1InitialMessage) {
+      initialPrompt = stepModule.getStep1InitialMessage(wizardData);
+    } else if (stepModule.getStep2InitialMessage) {
+      initialPrompt = stepModule.getStep2InitialMessage(wizardData);
+    } else if (stepModule.getStep3InitialMessage) {
+      initialPrompt = stepModule.getStep3InitialMessage(wizardData);
+    } else {
+      // Fallback for steps without specific initial message
+      initialPrompt = "Please create a draft Living File based on the inputs I provided.";
     }
 
     // Trigger auto-generation

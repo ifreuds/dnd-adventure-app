@@ -33,6 +33,12 @@ ${wizardData.mechanicsApproach === 'defaults' ?
 }`;
   }
 
+  if (stepKey === 'step2') {
+    userInputsContext = `\n\nUSER'S NPC COUNT: ${wizardData.npcCount || '[Not selected]'}
+
+IMPORTANT: Create COMPLETE profiles for exactly ${wizardData.npcCount} NPCs. Also create 2-4 factions that fit the world context.`;
+  }
+
   // Build context: existing Living Files from other steps
   const contextualInfo = [];
   if (wizardData.livingFiles.step0 && stepKey !== 'step0') contextualInfo.push(`World Context:\n${wizardData.livingFiles.step0}`);
