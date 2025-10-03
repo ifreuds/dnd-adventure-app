@@ -79,17 +79,36 @@ export async function generateNarration(context) {
       // Try to parse as direct JSON first
       result = JSON.parse(messageContent);
     } catch (parseError) {
-      // If that fails, try to extract JSON from markdown code blocks
+      console.log("⚠️ Direct JSON parse failed, trying extraction strategies...");
+
+      // Strategy 1: Extract from markdown code blocks
       const jsonMatch = messageContent.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
       if (jsonMatch) {
         try {
           result = JSON.parse(jsonMatch[1]);
+          console.log("✅ Extracted JSON from markdown code block");
         } catch (e) {
-          console.error("Failed to parse extracted JSON:", jsonMatch[1]);
-          throw new Error("GPT returned malformed JSON. Response: " + messageContent);
+          console.error("❌ Markdown extraction failed");
         }
-      } else {
-        console.error("Failed to parse GPT response:", messageContent);
+      }
+
+      // Strategy 2: Fix common JSON errors (like +10 instead of 10)
+      if (!result) {
+        try {
+          // Remove + prefix from positive numbers (invalid JSON)
+          const cleanedContent = messageContent.replace(/:\s*\+(\d+)/g, ': $1');
+          result = JSON.parse(cleanedContent);
+          console.log("✅ Fixed invalid + prefix in JSON");
+        } catch (e) {
+          console.error("❌ JSON cleanup failed");
+        }
+      }
+
+      // If all strategies failed
+      if (!result) {
+        console.error("❌ All JSON parsing strategies failed");
+        console.error("Response preview:", messageContent.substring(0, 500));
+        console.error("Full response:", messageContent);
         console.error("Parse error:", parseError);
         throw new Error("GPT returned invalid JSON. Response: " + messageContent);
       }
@@ -146,6 +165,15 @@ ${formatSceneLog(context.sceneLog)}
 - Reference NPCs, factions, and rules naturally as they become relevant
 - Track NPC relationships and update them based on player interactions
 
+DIALOGUE FORMATTING (CRITICAL):
+- Use quotation marks for all spoken dialogue: "Like this," she says.
+- Separate paragraphs with \\n\\n (blank line between paragraphs)
+- Put dialogue on its own line when possible
+- Example good format:
+  The room grows quiet.\\n\\nLyra steps forward. "We need to talk," she whispers.\\n\\nHer eyes dart to the door.
+- Example bad format (DO NOT DO THIS):
+  The room grows quiet. Lyra steps forward and whispers we need to talk while her eyes dart to the door.
+
 === OUTPUT FORMAT (Token-Optimized) ===
 Respond in JSON format (minified, no whitespace):
 
@@ -169,16 +197,18 @@ CRITICAL - Token Efficiency Rules:
 DELTA UPDATE FORMAT (only include if things changed):
 {
   "updates": {
-    "hp": -5,                           // HP change (relative)
-    "xp": +100,                         // XP gained (relative)
-    "gold": -20,                        // Gold spent (relative)
-    "npc_lyra_relationship": +10,       // Relationship change (use NPC id from Step 2)
-    "npc_baron_relationship": -15,
+    "hp": -5,                           // HP change (relative, negative for loss)
+    "xp": 100,                          // XP gained (positive number, no + prefix!)
+    "gold": -20,                        // Gold spent (negative for loss)
+    "npc_lyra_relationship": 10,        // Relationship increase (positive number, no + prefix!)
+    "npc_baron_relationship": -15,      // Relationship decrease (negative for loss)
     "flags_add": ["found_secret"],      // Story flags to add
     "inventory_add": [{"name": "Map", "type": "quest"}],
     "inventory_remove": [{"name": "Torch", "count": 1}]
   }
-}`;
+}
+
+CRITICAL: Do NOT use + prefix on positive numbers in JSON (invalid JSON). Use plain numbers like 10, not +10.`;
 }
 
 /**

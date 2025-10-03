@@ -250,9 +250,29 @@ export function renderGameUI(container, worldData = {}) {
   function addNarration(text) {
     const messageDiv = document.createElement("div");
     messageDiv.className = "narration-message";
-    messageDiv.textContent = text;
+
+    // Convert \n\n to actual line breaks for better readability
+    // Split by \n\n and create paragraph elements
+    const paragraphs = text.split(/\n\n+/);
+
+    if (paragraphs.length > 1) {
+      // Multiple paragraphs - create separate paragraph elements
+      messageDiv.innerHTML = paragraphs
+        .map(p => `<p style="margin: 0 0 10px 0; line-height: 1.6;">${escapeHtml(p.trim())}</p>`)
+        .join('');
+    } else {
+      // Single paragraph - just set text
+      messageDiv.textContent = text;
+    }
+
     el.chatMessages.appendChild(messageDiv);
     el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   function renderChoices(choices) {
