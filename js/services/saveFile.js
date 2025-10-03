@@ -42,6 +42,8 @@ export function createNewSaveFile(wizardData) {
 
     storyFlags: [],
 
+    sceneLog: [],  // Last 8-10 turns for DM context
+
     progressSummary: ""  // Will be updated as story progresses
   };
 }
@@ -240,9 +242,9 @@ export function applySaveFileUpdates(currentSaveFile, updates) {
  * Validate Save File structure
  */
 function validateSaveFile(saveFile) {
-  const required = ['metadata', 'character', 'npcs', 'inventory', 'storyFlags'];
+  const required = ['metadata', 'character', 'npcs', 'inventory', 'storyFlags', 'sceneLog'];
   required.forEach(field => {
-    if (!saveFile[field]) {
+    if (saveFile[field] === undefined) {
       throw new Error(`Invalid save file: missing ${field}`);
     }
   });

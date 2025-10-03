@@ -163,28 +163,48 @@ export function renderGameUI(container, worldData = {}) {
   let isMatureMode = false; // Track mature/romance mode toggle
   let diceActive = false;
   let savedImages = []; // Store generated images for gallery
-  let sceneLog = []; // Track recent turns for GPT context
+  let sceneLog = saveFile.sceneLog || []; // Load scene log from Save File
   let pendingDiceRoll = null; // Store dice roll context
 
   // Update character panel from Save File
   updateCharacterPanel();
 
-  // Extract Player Starting Story from Step 3 Living File
-  const step3Content = livingFiles.step3 || '';
-  const startingStoryMatch = step3Content.match(/===\s*PLAYER STARTING STORY\s*===\s*([\s\S]*?)(?===|$)/i);
-  const startingNarration = startingStoryMatch && startingStoryMatch[1].trim()
-    ? startingStoryMatch[1].trim()
-    : `Welcome to your adventure! Your journey begins...`;
+  // Check if this is a new game or continuing
+  const isNewGame = sceneLog.length === 0 && saveFile.metadata.turnCount === 0;
 
-  addNarration(startingNarration);
+  if (isNewGame) {
+    // New game: Generate first turn from DM using Player Starting Story as context
+    addNarration("Starting your adventure...");
 
-  // Extract first choices from starting story context or use defaults
-  const placeholderChoices = [
-    "Look around",
-    "Check your belongings",
-    "Move forward"
-  ];
-  renderChoices(placeholderChoices);
+    // Automatically trigger first DM response
+    // The DM will use the Player Starting Story from Step 3 Living File as context
+    setTimeout(() => {
+      handlePlayerAction("[GAME START] Generate the opening scene based on the Player Starting Story from the character backstory. Set the scene, describe the immediate situation, and present the first choices.");
+    }, 500);
+  } else {
+    // Continuing existing game: Show last narration from scene log
+    if (sceneLog.length > 0) {
+      const lastTurn = sceneLog[sceneLog.length - 1];
+      addNarration(lastTurn.outcome);
+
+      // Show generic choices to continue
+      const continueChoices = [
+        "Continue exploring",
+        "Check surroundings",
+        "Move forward"
+      ];
+      renderChoices(continueChoices);
+    } else {
+      // Fallback if scene log is empty but turn count > 0
+      addNarration("Continuing your adventure...");
+      const placeholderChoices = [
+        "Look around",
+        "Check your belongings",
+        "Move forward"
+      ];
+      renderChoices(placeholderChoices);
+    }
+  }
 
   // Functions
   function updateCharacterPanel() {
@@ -301,6 +321,10 @@ export function renderGameUI(container, worldData = {}) {
       if (sceneLog.length > 10) {
         sceneLog.shift();
       }
+
+      // Save scene log to Save File
+      saveFile.sceneLog = sceneLog;
+      localStorage.setItem('current_saveFile', JSON.stringify(saveFile));
 
       // Display narration
       addNarration(result.narration);
