@@ -91,6 +91,17 @@ IMPORTANT: Create COMPLETE profiles for exactly ${wizardData.npcCount} NPCs. Als
     if (data.usage) {
       console.log(`✅ AI response received - Token usage:`);
       console.log(`   📥 Input (prompt): ${data.usage.prompt_tokens} tokens`);
+
+      // Check for cached tokens (prompt caching)
+      if (data.usage.prompt_tokens_details?.cached_tokens) {
+        const cachedTokens = data.usage.prompt_tokens_details.cached_tokens;
+        const freshTokens = data.usage.prompt_tokens - cachedTokens;
+        console.log(`   💾 Cached input: ${cachedTokens} tokens (90% discount!)`);
+        console.log(`   🆕 Fresh input: ${freshTokens} tokens`);
+        const savings = ((cachedTokens / data.usage.prompt_tokens) * 100).toFixed(1);
+        console.log(`   💵 Cache savings: ${savings}% of input tokens`);
+      }
+
       console.log(`   📤 Output (completion): ${data.usage.completion_tokens} tokens`);
       console.log(`   💰 Total: ${data.usage.total_tokens} tokens`);
 
